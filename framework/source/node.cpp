@@ -42,10 +42,14 @@ void Node::setParent(Node* parent) {
 }
 
 Node* Node::getChildren(std::string t_child) const {
+	/*
 	for (auto it = m_children.begin(); it != m_children.end(); it++) {
-
+		if(*it.m_name == t_child) {
+			return *it;
+		}
 	}
-
+	*/
+	return nullptr;
 	
 }
 
@@ -86,5 +90,5 @@ void Node::addChildren(Node* t_child) {
 }
 
 Node* Node::removeChildren(std::string t_child) {
-
+	this -> m_children.remove(this -> getChildren(t_child));
 }
