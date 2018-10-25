@@ -9,16 +9,19 @@ using namespace gl;
 
 class Camera_Node {
 	public:
+		CamerNode(node* t_parent, std::string t_name, 
+			bool t_isPerspective, bool t_isEnabled,
+			glm::mat4 t_projectionMatrix);
 		bool getPerspective();
 		bool getEnabled();
 		void setEnabled(bool t_enabled);
-		std::mat4 getProjectionMatrix();
-		void setProjectionMatrix(std::mat4 t_matrix);
+		glm::mat4 getProjectionMatrix();
+		void setProjectionMatrix(glm::mat4 t_matrix);
 
 	private:
 		bool m_isPerspective;
 		bool m_isEnabled;
-		std::mat4 m_projectionMatrix;
+		glm::mat4 m_projectionMatrix;
 };
 
 #endif

@@ -7,8 +7,10 @@
 // use gl definitions from glbinding 
 using namespace gl;
 
-class Geometry_Node {
+class GeometryNode {
 	public:
+		GeometryNode(node* t_parent, std::string t_name,
+			Model t_model);
 		Model getGeometry();
 		void setGeometry(Model t_geometry);
 
