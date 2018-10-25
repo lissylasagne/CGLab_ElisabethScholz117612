@@ -1,44 +1,90 @@
 #include "node.hpp"
 
-Node::Node(node* t_parent, std::string t_name) :
-	m_parent{t_parent},
+
+/*
+Node::Node(Node const& parent, std::string const& name, glm::mat4 const& localTransform, glm::mat4 const& worldTransform) :
+	
+	m_parent{parent},
 	m_children{},
-	m_name{t_name},
+	m_name{name},
 	m_path{}, //TODO parent path + this node
 	m_depth{}, //TODO parnet depth +1
+	m_localTransform{localTransform},
+	m_worldTransform{worldTransform}
+	{
+		//m_path = m_parent -> getPath() + m_name;
+		//m_depth = m_parent -> getDepth()+1;	
+	}
+
+*/
+
+Node::Node(Node* parent, std::string const& name) :
+	
+	m_parent{parent},
+	m_children{},
+	m_name{name},
+	m_path{},
+	m_depth{},
 	m_localTransform{},
 	m_worldTransform{}
 	{
-		m_path = m_path.getPath() + m_name;
-		m_depth = m_parent.getDepth()+1;
-	//TODO world local mat4 zuweisen	
+		m_path = m_parent -> getPath() + m_name;
+		m_depth = m_parent -> getDepth()+1;	
+		m_parent -> addChildren(this);
 	}
 
-Node* getParent() const {
+Node* Node::getParent() const {
 	return m_parent;
 }
 
-void setParent(Node t_parent) {
-	m_parent = t_parent;
+void Node::setParent(Node* parent) {
+	m_parent = parent;
 }
 
-Node* getChildren(std::string t_child) const {
-	std::list<Node*>::iterator it;
-	for(it = m_children.begin(); it != m_children.end(); ++it) {
-		if (t_child == it->m_name) {
-			return it;
-		}
+Node* Node::getChildren(std::string t_child) const {
+	for (auto it = m_children.begin(); it != m_children.end(); it++) {
+
 	}
-	return nullptr;
+
+	
 }
 
-std::list<Node*> getChildrenList() const;
-std::string getName() const;
-std::string getPath() const;
-int getDepth() const;
-glm::mat4 getLocalTransform() const;
-void setLocalTransform(glm::mat4 t_local);
-glm::mat4 getWorldTransform() const;
-void setWorldTransform(glm::mat4 t_world);
-void addChildren(Node* t_child);
-Node*removeChildren(std::string t_child);
+std::list<Node*> Node::getChildrenList() const {
+	return m_children;
+}
+
+std::string Node::getName() const {
+	return m_name;
+}
+
+std::string Node::getPath() const {
+	return m_path;
+}
+
+int Node::getDepth() const {
+	return m_depth;
+}
+
+glm::mat4 Node::getLocalTransform() const {
+	return m_localTransform;
+}
+
+void Node::setLocalTransform(glm::mat4 t_local) {
+	m_localTransform = t_local;
+}
+
+glm::mat4 Node::getWorldTransform() const {
+	return m_worldTransform;	
+}
+
+void Node::setWorldTransform(glm::mat4 t_world) {
+	m_worldTransform = t_world;
+}
+
+void Node::addChildren(Node* t_child) {
+	m_children.push_back(t_child);
+}
+
+Node* Node::removeChildren(std::string t_child) {
+
+}
