@@ -18,15 +18,15 @@ Node::Node(Node const& parent, std::string const& name, glm::mat4 const& localTr
 
 */
 
-Node::Node(Node* parent, std::string const& name) :
+Node::Node(Node* parent, std::string const& name, glm::mat4 const& local, glm::mat4 const& world) :
 	
 	m_parent{parent},
 	m_children{},
 	m_name{name},
 	m_path{},
 	m_depth{},
-	m_localTransform{},
-	m_worldTransform{}
+	m_localTransform{local},
+	m_worldTransform{world}
 	{
 		m_path = m_parent -> getPath() + m_name;
 		m_depth = m_parent -> getDepth()+1;	
@@ -42,15 +42,15 @@ void Node::setParent(Node* parent) {
 }
 
 Node* Node::getChildren(std::string t_child) const {
-	/*
+	
 	for (auto it = m_children.begin(); it != m_children.end(); it++) {
-		if(*it.m_name == t_child) {
+		
+		if((*it) -> getName() == t_child) {
 			return *it;
 		}
 	}
-	*/
-	return nullptr;
 	
+	return nullptr;
 }
 
 std::list<Node*> Node::getChildrenList() const {
