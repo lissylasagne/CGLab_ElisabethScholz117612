@@ -28,8 +28,18 @@ Node::Node(Node* parent, std::string const& name, glm::mat4 const& local, glm::m
 	m_localTransform{local},
 	m_worldTransform{world}
 	{
-		m_path = m_parent -> getPath() + m_name;
-		m_depth = m_parent -> getDepth()+1;	
+		if(m_parent!= nullptr) {
+			m_path = m_parent -> getPath() + m_name;
+		} else {
+			m_path = m_name;
+		}
+
+		if(m_parent!= nullptr) {
+			m_depth = m_parent -> getDepth()+1;	
+		} else {
+			m_depth = 0;
+		}
+
 		m_parent -> addChildren(this);
 	}
 
@@ -39,6 +49,7 @@ Node* Node::getParent() const {
 
 void Node::setParent(Node* parent) {
 	m_parent = parent;
+	
 }
 
 Node* Node::getChildren(std::string t_child) const {

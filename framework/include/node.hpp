@@ -4,6 +4,7 @@
 #include <glbinding/gl/types.h>
 #include <list>
 #include <glm/glm.hpp>
+#include "model.hpp"
 
 // use gl definitions from glbinding 
 using namespace gl;
