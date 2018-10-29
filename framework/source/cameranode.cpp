@@ -1,6 +1,6 @@
-#include "geometry_node.hpp"
+#include "geometrynode.hpp"
 
-CameraNode::CameraNode(node* t_parent, std::string t_name, 
+CameraNode::CameraNode(Node* t_parent, std::string t_name, 
 			bool t_isPerspective, bool t_isEnabled,
 			glm::mat4 t_projectionMatrix) :
 	Node{t_parent, t_name},
