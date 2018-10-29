@@ -62,7 +62,7 @@ add_executable(solar_system application/source/application_solar.cpp)
 target_link_libraries(solar_system framework)
 
 add_executable(scene_test framework/source/test.cpp)
-target_link_libraries(test)
+target_link_libraries(scene_test framework)
 
 set(CATCH_DIRECTORY catch-1.4.0)
 include_directories(${CMAKE_CURRENT_SOURCE_DIR}/external/${CATCH_DIRECTORY})

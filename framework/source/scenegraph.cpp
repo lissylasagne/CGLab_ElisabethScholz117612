@@ -5,22 +5,22 @@ SceneGraph::SceneGraph(std::string const& t_name, Node* t_root) :
 	m_root{t_root}
 	{}
 
-std::string Node::getName() const {
+std::string SceneGraph::getName() const {
 	return m_name;
 }
 
-void Node::setName(std::string const& t_name) {
+void SceneGraph::setName(std::string const& t_name) {
 	m_name = t_name;
 }
 
-Node* Node::getRoot() const {
+Node* SceneGraph::getRoot() const {
 	return m_root;
 }
 
-void Node::setRoot(Node* t_root) {
+void SceneGraph::setRoot(Node* t_root) {
 	m_root = t_root;
 }
 
-std::string Node::printGraph() const {
-	return t_name;
+std::string SceneGraph::printGraph() const {
+	return m_name;
 }
