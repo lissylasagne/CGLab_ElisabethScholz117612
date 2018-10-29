@@ -1,5 +1,5 @@
 #include "node.hpp"
-
+#include <iostream>
 
 /*
 Node::Node(Node const& parent, std::string const& name, glm::mat4 const& localTransform, glm::mat4 const& worldTransform) :
@@ -18,6 +18,18 @@ Node::Node(Node const& parent, std::string const& name, glm::mat4 const& localTr
 
 */
 
+Node::Node(std::string const& name):
+	m_parent{},
+	m_children{std::list<Node*>()},
+	m_name{name},
+	m_path{name},
+	m_depth{0},
+	m_localTransform{},
+	m_worldTransform{}
+{
+	std::cout<<"Default Constructor was called.\n";
+}
+
 Node::Node(Node* parent, std::string const& name, glm::mat4 const& local, glm::mat4 const& world) :
 	
 	m_parent{parent},
@@ -27,32 +39,34 @@ Node::Node(Node* parent, std::string const& name, glm::mat4 const& local, glm::m
 	m_depth{},
 	m_localTransform{local},
 	m_worldTransform{world}
-	{
-		//set path
-		if(m_parent!= nullptr) {
-			m_path = m_parent -> getPath() + m_name;
-		} else {
-			m_path = m_name;
-		}
-
-		//set depth
-		if(m_parent!= nullptr) {
-			m_depth = m_parent -> getDepth()+1;	
-		} else {
-			m_depth = 0;
-		}
-
-		//add this node to parent's children
-		m_parent -> addChildren(this);
+{
+	std::cout<<"Custom Constructor was called.\n";
+	//set path
+	if(m_parent!= nullptr) {
+		m_path = m_parent -> getPath() + m_name;
+	} else {
+		m_path = m_name;
 	}
+
+	//set depth
+	if(m_parent!= nullptr) {
+		m_depth = m_parent -> getDepth()+1;	
+	} else {
+		m_depth = 0;
+	}
+
+	//add this node to parent's children
+	m_parent -> addChildren(this);
+}
 
 Node* Node::getParent() const {
 	return m_parent;
 }
 
-void Node::setParent(Node* parent) {
-	m_parent = parent;
-	
+void Node::setParent(Node* t_parent) {
+	m_parent = t_parent;
+	m_path = t_parent->getPath() + m_name;
+	m_depth = t_parent->getDepth() + 1;
 }
 
 Node* Node::getChildren(std::string t_child) const {
@@ -64,6 +78,7 @@ Node* Node::getChildren(std::string t_child) const {
 		}
 	}
 	
+	//if t_child cannot be found
 	return nullptr;
 }
 
@@ -101,9 +116,11 @@ void Node::setWorldTransform(glm::mat4 t_world) {
 
 void Node::addChildren(Node* t_child) {
 	m_children.push_back(t_child);
+	t_child->setParent(this);
 }
 
-Node* Node::removeChildren(std::string t_child) {
-							//find t_child in children list
-	this -> m_children.remove(this -> getChildren(t_child));
+Node* Node::removeChildren(std::string t_child){ //find t_child in children list
+  Node* tmp = getChildren(t_child);
+  m_children.remove(getChildren(t_child));
+  return tmp;
 }

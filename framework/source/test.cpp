@@ -11,38 +11,46 @@ TEST_CASE("node","[node]") {
 	SECTION("constructor, getter") {
 		glm::mat4 mat1 = glm::mat4(1.0);
 		glm::mat4 mat2 = glm::mat4(0.0);
-		
-		Node node1{nullptr, "node1", mat1, mat2};
-		Node node2{&node1, "node2", mat1, mat2};
-		Node node3{nullptr, "node3", mat1, mat2};
-		
-		REQUIRE(node1.getParent() == nullptr);
-		REQUIRE(node2.getParent() == &node1);
-		node3.setParent(&node2);
-		REQUIRE(node3.getParent() == &node2);
 
-		REQUIRE(node1.getChildren("node2") == &node2);
-		REQUIRE(node2.getChildren("node3") == &node3);
+		Node root{"root"};
+		Node child1{&root, "child1", mat1, mat2};
+		Node child2{"child2"};
+		child2.setParent(&root);
+		child2.setLocalTransform(mat1);
+		child2.setWorldTransform(mat2);
 
-		REQUIRE(*(node1.getChildrenList().begin()) == &node2);
-		REQUIRE(*(node2.getChildrenList().begin()) == &node3);
+		//Testing getting and setting Parent Relation
+		REQUIRE(root.getParent() == nullptr);
+		REQUIRE(child1.getParent() == &root);
+		REQUIRE(child2.getParent() == &root);
+		child2.setParent(&child1);
+		REQUIRE(child2.getParent() == &child1);
 
-		REQUIRE(node1.getName() == "node1");
-		REQUIRE(node2.getName() == "node2");
-		REQUIRE(node3.getName() == "node3");
+		//Testing getting and setting Child Relation
+		REQUIRE(root.getChildren("child1") == &child1);
+		REQUIRE(root.getChildren("nd") == nullptr);
 
-		//REQUIRE(node1.getPath() ==);
-		REQUIRE(node1.getDepth() == 0);
-		REQUIRE(node2.getDepth() == 1);
-		REQUIRE(node3.getDepth() == 2);
+		Node newchild{"newchild"};
+		root.addChildren(&newchild);
+		REQUIRE(root.getChildren("newchild") == &newchild);
+		Node removedNode = *(root.removeChildren("newchild"));
+		REQUIRE(root.getChildren("newchild") == nullptr);
 
-		REQUIRE(node1.getLocalTransform() == mat1);
-		REQUIRE(node1.getWorldTransform() == mat2);
+		//Path and Depth
+		std::cout<<"Paths \n";
+		std::cout<<"root: "<<root.getPath()<<"\n";
+		std::cout<<"child1: "<<child1.getPath()<<"\n";
+		std::cout<<"child2: "<<child2.getPath()<<"\n";
+		std::cout<<"newchild: "<<removedNode.getPath()<<"\n";
 
-		node1.setLocalTransform(mat2);
-		node1.setWorldTransform(mat1);
-		REQUIRE(node1.getLocalTransform() == mat2);
-		REQUIRE(node1.getWorldTransform() == mat1);
+		REQUIRE(root.getDepth() == 0);
+		REQUIRE(child1.getDepth() == 1);
+		REQUIRE(child2.getDepth() == 2);
+
+		Node c{"c"};
+		root.addChildren(&c);
+		std::cout<<c.getPath();
+		std::cout<<c.getDepth();
 	}
 }
 

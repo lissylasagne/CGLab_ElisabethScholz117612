@@ -11,6 +11,7 @@ using namespace gl;
 
 class Node {
 	public:
+		Node(std::string const& name);
 		Node(Node* parent, std::string const& name, glm::mat4 const& local, glm::mat4 const& world);
 		Node* getParent() const;
 		void setParent(Node* parent);
@@ -25,7 +26,6 @@ class Node {
 		void setWorldTransform(glm::mat4 t_world);
 		void addChildren(Node* t_child);
 		Node* removeChildren(std::string t_child);
-
 
 	private:
 		Node* m_parent;
