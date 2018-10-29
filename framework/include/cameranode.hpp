@@ -7,15 +7,16 @@
 // use gl definitions from glbinding 
 using namespace gl;
 
-class CameraNode : public Node {
+class CameraNode : public Node{
 	public:
-		CamerNode(Node* t_parent, std::string t_name, 
-			bool t_isPerspective, bool t_isEnabled,
+		CameraNode(Node* t_parent, std::string const& t_name,
+			glm::mat4 const& t_local, glm::mat4 const& t_world, 
+			bool const& t_isPerspective, bool const& t_isEnabled,
 			glm::mat4 t_projectionMatrix);
-		bool getPerspective();
-		bool getEnabled();
+		bool getPerspective() const;
+		bool getEnabled() const;
 		void setEnabled(bool t_enabled);
-		glm::mat4 getProjectionMatrix();
+		glm::mat4 getProjectionMatrix() const;
 		void setProjectionMatrix(glm::mat4 t_matrix);
 
 	private:

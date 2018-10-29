@@ -4,14 +4,14 @@
 #include <glbinding/gl/types.h>
 #include <list>
 #include <glm/glm.hpp>
+#include "model.hpp"
 
 // use gl definitions from glbinding 
 using namespace gl;
 
 class Node {
 	public:
-		Node(Node* parent, std::string const& name);
-		//Node(Node const& parent, std::string const& name, glm::mat4 const& localTransform, glm::mat4 const& worldTransform);
+		Node(Node* parent, std::string const& name, glm::mat4 const& local, glm::mat4 const& world);
 		Node* getParent() const;
 		void setParent(Node* parent);
 		Node* getChildren(std::string t_child) const;

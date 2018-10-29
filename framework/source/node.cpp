@@ -18,18 +18,31 @@ Node::Node(Node const& parent, std::string const& name, glm::mat4 const& localTr
 
 */
 
-Node::Node(Node* parent, std::string const& name) :
+Node::Node(Node* parent, std::string const& name, glm::mat4 const& local, glm::mat4 const& world) :
 	
 	m_parent{parent},
 	m_children{},
 	m_name{name},
 	m_path{},
 	m_depth{},
-	m_localTransform{},
-	m_worldTransform{}
+	m_localTransform{local},
+	m_worldTransform{world}
 	{
-		m_path = m_parent -> getPath() + m_name;
-		m_depth = m_parent -> getDepth()+1;	
+		//set path
+		if(m_parent!= nullptr) {
+			m_path = m_parent -> getPath() + m_name;
+		} else {
+			m_path = m_name;
+		}
+
+		//set depth
+		if(m_parent!= nullptr) {
+			m_depth = m_parent -> getDepth()+1;	
+		} else {
+			m_depth = 0;
+		}
+
+		//add this node to parent's children
 		m_parent -> addChildren(this);
 	}
 
@@ -39,18 +52,19 @@ Node* Node::getParent() const {
 
 void Node::setParent(Node* parent) {
 	m_parent = parent;
+	
 }
 
 Node* Node::getChildren(std::string t_child) const {
-	/*
+	//search for t_child in list of children
 	for (auto it = m_children.begin(); it != m_children.end(); it++) {
-		if(*it.m_name == t_child) {
+		
+		if((*it) -> getName() == t_child) {
 			return *it;
 		}
 	}
-	*/
-	return nullptr;
 	
+	return nullptr;
 }
 
 std::list<Node*> Node::getChildrenList() const {
@@ -90,5 +104,6 @@ void Node::addChildren(Node* t_child) {
 }
 
 Node* Node::removeChildren(std::string t_child) {
+							//find t_child in children list
 	this -> m_children.remove(this -> getChildren(t_child));
 }
