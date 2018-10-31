@@ -58,9 +58,11 @@ void ApplicationSolar::renderPlanets() const{
 
     glm::fmat4 model_matrix = glm::fmat4(1.0f);
 
-    //at this point, transformations on planets should be performed
+    //at this point, transformations on planets should be performed, with the moon
+    //requiring additional transformation dependent on the parent node (rotation around sun AND planet)
+    //information about the planets transformation needs to be stored somewhere, e.g. extra variable in
+    //(inherited) class for planet nodes
 
-    //weiter mit vorhandenem code
     glUniformMatrix4fv(m_shaders.at("planet").u_locs.at("ModelMatrix"),
                        1, GL_FALSE, glm::value_ptr(model_matrix));
 
