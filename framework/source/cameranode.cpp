@@ -10,6 +10,19 @@ CameraNode::CameraNode(Node* t_parent, std::string const& t_name,
 	m_projectionMatrix{t_projectionMatrix}
 {}
 
+CameraNode::CameraNode(std::string const& t_name, 
+			glm::mat4 const& t_local, glm::mat4 const& t_world, 
+			bool const& t_isPerspective, bool const& t_isEnabled,
+			glm::mat4 t_projectionMatrix) :
+	Node{t_name},
+	m_isPerspective{t_isPerspective},
+	m_isEnabled{t_isEnabled},
+	m_projectionMatrix{t_projectionMatrix}
+{
+	setLocalTransform(t_local);
+	setWorldTransform(t_world);
+}
+
 bool CameraNode::getPerspective() const{
 	return m_isPerspective;
 }

@@ -13,12 +13,15 @@ class CameraNode : public Node{
 			glm::mat4 const& t_local, glm::mat4 const& t_world, 
 			bool const& t_isPerspective, bool const& t_isEnabled,
 			glm::mat4 t_projectionMatrix);
+		CameraNode(std::string const& t_name,
+			glm::mat4 const& t_local, glm::mat4 const& t_world, 
+			bool const& t_isPerspective, bool const& t_isEnabled,
+			glm::mat4 t_projectionMatrix);
 		bool getPerspective() const;
 		bool getEnabled() const;
 		void setEnabled(bool t_enabled);
 		glm::mat4 getProjectionMatrix() const;
 		void setProjectionMatrix(glm::mat4 t_matrix);
-
 	private:
 		bool m_isPerspective;
 		bool m_isEnabled;

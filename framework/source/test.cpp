@@ -54,6 +54,20 @@ TEST_CASE("node","[node]") {
 	}
 }
 
+TEST_CASE("cameranode","[cameranode]") {
+	glm::mat4 mat1 = glm::mat4(1.0);
+	glm::mat4 mat2 = glm::mat4(0.0);
+
+	model testmodel{};
+
+	CameraNode cam{"cam", mat1, mat2, true, true, mat1};
+	CameraNode sub_cam{&cam, "sub_cam", mat1, mat2, false, false, mat2};
+	GeometryNode geo{"geo", mat1, mat2, testmodel};
+	GeometryNode sub_geo{&geo, "geo", mat1, mat2, testmodel};
+
+	SceneGraph testscene{"testscene", &geo};
+}
+
 
 int main(int argc, char *argv[])
 {

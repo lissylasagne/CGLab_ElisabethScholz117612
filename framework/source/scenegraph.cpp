@@ -1,5 +1,10 @@
 #include "scenegraph.hpp"
 
+SceneGraph::SceneGraph() :
+	m_name{"default"},
+	m_root{nullptr}
+{}
+
 SceneGraph::SceneGraph(std::string const& t_name, Node* t_root) :
 	m_name{t_name},
 	m_root{t_root}

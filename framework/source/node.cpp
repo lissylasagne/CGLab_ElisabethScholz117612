@@ -30,7 +30,8 @@ Node::Node(std::string const& name):
 	std::cout<<"Default Constructor was called.\n";
 }
 
-Node::Node(Node* parent, std::string const& name, glm::mat4 const& local, glm::mat4 const& world) :
+Node::Node(Node* parent, std::string const& name, glm::mat4 const& local,
+		glm::mat4 const& world) :
 	
 	m_parent{parent},
 	m_children{},
@@ -43,7 +44,7 @@ Node::Node(Node* parent, std::string const& name, glm::mat4 const& local, glm::m
 	std::cout<<"Custom Constructor was called.\n";
 	//set path
 	if(m_parent!= nullptr) {
-		m_path = m_parent -> getPath() + m_name;
+		m_path = m_parent -> getPath() + "/" + m_name;
 	} else {
 		m_path = m_name;
 	}

@@ -3,6 +3,7 @@
 
 #include "application.hpp"
 #include "model.hpp"
+#include "scenegraph.hpp"
 #include "structs.hpp"
 
 // gpu representation of model
@@ -26,6 +27,7 @@ class ApplicationSolar : public Application {
  protected:
   void initializeShaderPrograms();
   void initializeGeometry();
+  void initializeScene();
   // update uniform values
   void uploadUniforms();
   // upload projection matrix
@@ -33,13 +35,23 @@ class ApplicationSolar : public Application {
   // upload view matrix
   void uploadView();
 
+  void renderPlanets() const;
+
   // cpu representation of model
   model_object planet_object;
   
   // camera transform matrix
   glm::fmat4 m_view_transform;
+
   // camera projection matrix
   glm::fmat4 m_view_projection;
+
+  //Edited: Member Variables to hold Scene Graph and the Planet Model
+  //which will used for the planets
+
+  SceneGraph m_scene;
+  model m_planet_model;
+
 };
 
 #endif

@@ -7,6 +7,7 @@
 
 class SceneGraph {
 	public:
+		SceneGraph();
 		SceneGraph(std::string const& t_name, Node* t_root);
 		std::string getName() const;
 		void setName(std::string const& t_name);

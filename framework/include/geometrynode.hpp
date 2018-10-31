@@ -13,6 +13,9 @@ class GeometryNode : public Node{
 		GeometryNode(Node* t_parent, std::string const& t_name,
 			glm::mat4 const& t_local, glm::mat4 const& t_world,
 			model const& t_model);
+		GeometryNode(std::string const& t_name,
+			glm::mat4 const& t_local, glm::mat4 const& t_world,
+			model const& t_model);
 		model getGeometry();
 		void setGeometry(model t_geometry);
 
