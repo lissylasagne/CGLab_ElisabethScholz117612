@@ -27,7 +27,7 @@ class ApplicationSolar : public Application {
  protected:
   void initializeShaderPrograms();
   void initializeGeometry();
-  void initializeScene();
+  //void initializeScene();
   // update uniform values
   void uploadUniforms();
   // upload projection matrix
@@ -35,7 +35,9 @@ class ApplicationSolar : public Application {
   // upload view matrix
   void uploadView();
 
-  void renderPlanets() const;
+  void renderPlanet(GeometryNode* planet, float distanceFromSun, float speed) const;
+  void initializePlanets() const;
+  
 
   // cpu representation of model
   model_object planet_object;
