@@ -27,7 +27,7 @@ class ApplicationSolar : public Application {
  protected:
   void initializeShaderPrograms();
   void initializeGeometry();
-  //void initializeScene();
+  void initializeScene();
   // update uniform values
   void uploadUniforms();
   // upload projection matrix
@@ -38,11 +38,13 @@ class ApplicationSolar : public Application {
   void renderPlanet(GeometryNode* planet, float distanceFromSun, float speed) const;
   void initializePlanets() const;
 
-  void initializeStars() const;
-  
+  void renderStars() const;
+  void initializeStars(int numberStars);
+
 
   // cpu representation of model
   model_object planet_object;
+  model_object star_object;
   
   // camera transform matrix
   glm::fmat4 m_view_transform;
@@ -54,6 +56,7 @@ class ApplicationSolar : public Application {
   //which will used for the planets
 
   SceneGraph m_scene;
+  std::vector<float> m_stars;
   model m_planet_model;
 
 };

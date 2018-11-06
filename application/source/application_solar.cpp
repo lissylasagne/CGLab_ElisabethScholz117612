@@ -27,6 +27,7 @@ ApplicationSolar::ApplicationSolar(std::string const& resource_path)
 {
   initializeGeometry();
   initializeShaderPrograms();
+  initializeStars(100);
 }
 
 ApplicationSolar::~ApplicationSolar() {
@@ -40,165 +41,10 @@ void ApplicationSolar::render() const {
   // bind shader to upload uniforms
   glUseProgram(m_shaders.at("planet").handle);
 
-  //rendern planets
+  //rendern pmlanets
   initializePlanets();
-  initializeStars();
-
-  /*
-  // bind shader to upload uniforms
-  glUseProgram(m_shaders.at("planet").handle);
-
-  glm::fmat4 model_matrix = glm::rotate(glm::fmat4{}, float(glfwGetTime()), glm::fvec3{0.0f, 1.0f, 0.0f});
-  model_matrix = glm::translate(model_matrix, glm::fvec3{0.0f, 0.0f, -1.0f});
-  glUniformMatrix4fv(m_shaders.at("planet").u_locs.at("ModelMatrix"),
-                     1, GL_FALSE, glm::value_ptr(model_matrix));
-
-  // extra matrix for normal transformation to keep them orthogonal to surface
-  glm::fmat4 normal_matrix = glm::inverseTranspose(glm::inverse(m_view_transform) * model_matrix);
-  glUniformMatrix4fv(m_shaders.at("planet").u_locs.at("NormalMatrix"),
-                     1, GL_FALSE, glm::value_ptr(normal_matrix));
-
-  // bind the VAO to draw
-  glBindVertexArray(planet_object.vertex_AO);
-
-  // draw bound vertex array using bound shader
-  glDrawElements(planet_object.draw_mode, planet_object.num_elements, model::INDEX.type, NULL);
-  */
+  //renderStars();
 }
-
-
-void ApplicationSolar::renderPlanet(GeometryNode* planet, float distanceFromSun, float speed) const {
-  glm::fmat4 model_matrix = planet->getLocalTransform();
-  model_matrix = glm::translate(
-    glm::rotate(
-      model_matrix, 
-      float(glfwGetTime())*speed, 
-      glm::fvec3{0.0f, 1.0f, 0.0f}),
-    glm::fvec3{distanceFromSun, 0.0f, 0.0f});
-  glUniformMatrix4fv(m_shaders.at("planet").u_locs.at("ModelMatrix"),
-                     1, GL_FALSE, glm::value_ptr(model_matrix));
-
-  // extra matrix for normal transformation to keep them orthogonal to surface
-  glm::fmat4 normal_matrix = glm::inverseTranspose(glm::inverse(m_view_transform) * model_matrix);
-  glUniformMatrix4fv(m_shaders.at("planet").u_locs.at("NormalMatrix"),
-                     1, GL_FALSE, glm::value_ptr(normal_matrix));
-
-  // bind the VAO to draw
-  glBindVertexArray(planet_object.vertex_AO);
-
-  // draw bound vertex array using bound shader
-  glDrawElements(planet_object.draw_mode, planet_object.num_elements, model::INDEX.type, NULL);
-  
-}
-
-//iterate trough the SceneGraph and transform and render the Planets
-void ApplicationSolar::initializePlanets() const{
-
-  std::cout << "initializing scene\n";
-
-  glm::fmat4 unitmat{ 1.0f, 0.0f, 0.0f, 0.0f, 
-                      0.0f, 1.0f, 0.0f, 0.0f,
-                      0.0f, 0.0f, 1.0f, 0.0f, 
-                      0.0f, 0.0f, 0.0f, 1.0f};
-  //create root
-  Node root{"root"};
-
-  //create structure of solar system in scenegraph
-  GeometryNode sun{"sun", unitmat, unitmat, m_planet_model};
-  root.addChildren(&sun);
-
-  renderPlanet(&sun, 0.0f, 1.0f);
-
-  GeometryNode planet1{"planet1", unitmat, unitmat, m_planet_model};
-  sun.addChildren(&planet1);
-  planet1.setLocalTransform(glm::fmat4{ 1.0f, 0.0f, 0.0f, 0.0f, 
-                                        0.0f, 1.0f, 0.0f, 0.0f,
-                                        0.0f, 0.0f, 1.0f, 0.0f, 
-                                        0.0f, 0.0f, 0.0f, 5.0});
-  renderPlanet(&planet1, 10.0f, 2.4f);
-
-  GeometryNode planet2{"planet2", unitmat, unitmat, m_planet_model};
-  sun.addChildren(&planet2);
-  planet2.setLocalTransform(glm::fmat4{ 1.0f, 0.0f, 0.0f, 0.0f, 
-                                        0.0f, 1.0f, 0.0f, 0.0f,
-                                        0.0f, 0.0f, 1.0f, 0.0f, 
-                                        0.0f, 0.0f, 0.0f, 3.5f});
-  renderPlanet(&planet2, 20.0f, 0.5f);
-
-  GeometryNode planet3{"planet3", unitmat, unitmat, m_planet_model};
-  planet2.addChildren(&planet3);
-  planet3.setLocalTransform(glm::fmat4{ 1.0f, 0.0f, 0.0f, 0.0f, 
-                                        0.0f, 1.0f, 0.0f, 0.0f,
-                                        0.0f, 0.0f, 1.0f, 0.0f, 
-                                        0.0f, 0.0f, 0.0f, 2.5f});
-  renderPlanet(&planet3, 30.0f, 1.0f);
-}
-
-void ApplicationSolar::initializeStars() const {
-  glm::fmat4 randmat{ 1.0f, 0.0f, 0.0f, 0.0f, 
-                      0.0f, 1.0f, 0.0f, 0.0f,
-                      0.0f, 0.0f, 1.0f, 0.0f, 
-                      0.0f, 0.0f, 0.0f, float(rand() % 200 + (-100))};
-
-  glm::fmat4 unitmat{ 1.0f, 0.0f, 0.0f, 0.0f, 
-                      0.0f, 1.0f, 0.0f, 0.0f,
-                      0.0f, 0.0f, 1.0f, 0.0f, 
-                      0.0f, 0.0f, 0.0f, 1.0f};
-  //create root
-for(int i = 0; i <= 10; i++) {
-    GeometryNode star{"star", randmat, unitmat, m_planet_model};
-
-    glm::fmat4 model_matrix = star.getLocalTransform();
-    model_matrix = glm::translate(
-      model_matrix,
-      glm::fvec3{float(rand() % 200 + (-100)), float(rand() % 200 + (-100)), float(rand() % 200 + (-100))});
-    glUniformMatrix4fv(m_shaders.at("planet").u_locs.at("ModelMatrix"),
-                       1, GL_FALSE, glm::value_ptr(model_matrix));
-
-    // extra matrix for normal transformation to keep them orthogonal to surface
-    glm::fmat4 normal_matrix = glm::inverseTranspose(glm::inverse(m_view_transform) * model_matrix);
-    glUniformMatrix4fv(m_shaders.at("planet").u_locs.at("NormalMatrix"),
-                       1, GL_FALSE, glm::value_ptr(normal_matrix));
-
-    // bind the VAO to draw
-    glBindVertexArray(planet_object.vertex_AO);
-
-    // draw bound vertex array using bound shader
-    glDrawElements(planet_object.draw_mode, planet_object.num_elements, model::INDEX.type, NULL);
-  }
-}
-
-/*
-  std::list<Node*> planet_list = m_scene.getRoot()->getChildren("sun")->getChildrenList();
-  
-  float distanceFromSun = 0;
-  for(auto const& planet : planet_list){
-
-    glm::fmat4 model_matrix = glm::fmat4(1.0f);
-
-    //at this point, transformations on planets should be performed, with the moon
-    //requiring additional transformation dependent on the parent node (rotation around sun AND planet)
-    //information about the planets transformation needs to be stored somewhere, e.g. extra variable in
-    //(inherited) class for planet nodes
-
-    glUniformMatrix4fv(m_shaders.at("planet").u_locs.at("ModelMatrix"),
-                       1, GL_FALSE, glm::value_ptr(model_matrix));
-
-    // extra matrix for normal transformation to keep them orthogonal to surface
-    glm::fmat4 normal_matrix = glm::inverseTranspose(glm::inverse(m_view_transform) * model_matrix);
-    glUniformMatrix4fv(m_shaders.at("planet").u_locs.at("NormalMatrix"),
-                       1, GL_FALSE, glm::value_ptr(normal_matrix));
-
-    // bind the VAO to draw
-    glBindVertexArray(planet_object.vertex_AO);
-
-    // draw bound vertex array using bound shader
-    glDrawElements(planet_object.draw_mode, planet_object.num_elements, model::INDEX.type, NULL);
-
-    distanceFromSun++;
-  }
-  */
-
 
 
 
@@ -274,10 +120,79 @@ void ApplicationSolar::initializeGeometry() {
   planet_object.draw_mode = GL_TRIANGLES;
   // transfer number of indices to model object 
   planet_object.num_elements = GLsizei(planet_model.indices.size());
+
+
+  //star geometry
+  model star_model = model_loader::obj(m_resource_path + "models/sphere.obj", model::NORMAL);
+
+  // generate vertex array object
+  glGenVertexArrays(1, &star_object.vertex_AO);
+  // bind the array for attaching buffers
+  glBindVertexArray(star_object.vertex_AO);
+
+  // generate generic buffer
+  glGenBuffers(1, &star_object.vertex_BO);
+  // bind this as an vertex array buffer containing all attributes
+  glBindBuffer(GL_ARRAY_BUFFER, star_object.vertex_BO);
+  // configure currently bound array buffer
+  glBufferData(GL_ARRAY_BUFFER, sizeof(float) * star_model.data.size(), star_model.data.data(), GL_STATIC_DRAW);
+
+  // activate first attribute on gpu
+  glEnableVertexAttribArray(0);
+  // first attribute is 3 floats with no offset & stride
+  glVertexAttribPointer(0, model::POSITION.components, model::POSITION.type, GL_FALSE, star_model.vertex_bytes, star_model.offsets[model::POSITION]);
+  // activate second attribute on gpu
+  glEnableVertexAttribArray(1);
+  // second attribute is 3 floats with no offset & stride
+  glVertexAttribPointer(1, model::NORMAL.components, model::NORMAL.type, GL_FALSE, star_model.vertex_bytes, star_model.offsets[model::NORMAL]);
+
+  // generate generic buffer
+  glGenBuffers(1, &star_object.element_BO);
+  // bind this as an vertex array buffer containing all attributes
+  glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, star_object.element_BO);
+  // configure currently bound array buffer
+  glBufferData(GL_ELEMENT_ARRAY_BUFFER, model::INDEX.size * star_model.indices.size(), star_model.indices.data(), GL_STATIC_DRAW);
+
+  // store type of primitive to draw
+  star_object.draw_mode = GL_POINTS;
+  // transfer number of indices to model object 
+  star_object.num_elements = GLsizei(star_model.indices.size());
+
 }
 
-/*
 void ApplicationSolar::initializeScene() {
+  Node* root = new Node("root");
+  m_scene = SceneGraph("scene", root);
+}
+
+void ApplicationSolar::renderPlanet(GeometryNode* planet, float distanceFromSun, float speed) const {
+  glm::fmat4 model_matrix = planet->getLocalTransform();
+  model_matrix = glm::translate(
+    glm::rotate(
+      model_matrix, 
+      float(glfwGetTime())*speed, 
+      glm::fvec3{0.0f, 1.0f, 0.0f}),
+    glm::fvec3{distanceFromSun, 0.0f, 0.0f});
+  glUniformMatrix4fv(m_shaders.at("planet").u_locs.at("ModelMatrix"),
+                     1, GL_FALSE, glm::value_ptr(model_matrix));
+
+  // extra matrix for normal transformation to keep them orthogonal to surface
+  glm::fmat4 normal_matrix = glm::inverseTranspose(glm::inverse(m_view_transform) * model_matrix);
+  glUniformMatrix4fv(m_shaders.at("planet").u_locs.at("NormalMatrix"),
+                     1, GL_FALSE, glm::value_ptr(normal_matrix));
+
+  // bind the VAO to draw
+  glBindVertexArray(planet_object.vertex_AO);
+
+  // draw bound vertex array using bound shader
+  glDrawElements(planet_object.draw_mode, planet_object.num_elements, model::INDEX.type, NULL);
+  
+}
+
+
+//iterate trough the SceneGraph and transform and render the Planets
+void ApplicationSolar::initializePlanets() const{
+
   std::cout << "initializing scene\n";
 
   glm::fmat4 unitmat{ 1.0f, 0.0f, 0.0f, 0.0f, 
@@ -291,9 +206,60 @@ void ApplicationSolar::initializeScene() {
   GeometryNode sun{"sun", unitmat, unitmat, m_planet_model};
   root.addChildren(&sun);
 
-  m_scene = SceneGraph{"scene", &sun};
+  renderPlanet(&sun, 0.0f, 1.0f);
+
+  GeometryNode planet1{"planet1", unitmat, unitmat, m_planet_model};
+  sun.addChildren(&planet1);
+  planet1.setLocalTransform(glm::fmat4{ 1.0f, 0.0f, 0.0f, 0.0f, 
+                                        0.0f, 1.0f, 0.0f, 0.0f,
+                                        0.0f, 0.0f, 1.0f, 0.0f, 
+                                        0.0f, 0.0f, 0.0f, 5.0});
+  renderPlanet(&planet1, 10.0f, 2.4f);
+
+  GeometryNode planet2{"planet2", unitmat, unitmat, m_planet_model};
+  sun.addChildren(&planet2);
+  planet2.setLocalTransform(glm::fmat4{ 1.0f, 0.0f, 0.0f, 0.0f, 
+                                        0.0f, 1.0f, 0.0f, 0.0f,
+                                        0.0f, 0.0f, 1.0f, 0.0f, 
+                                        0.0f, 0.0f, 0.0f, 3.5f});
+  renderPlanet(&planet2, 20.0f, 0.5f);
+
+  GeometryNode planet3{"planet3", unitmat, unitmat, m_planet_model};
+  planet2.addChildren(&planet3);
+  planet3.setLocalTransform(glm::fmat4{ 1.0f, 0.0f, 0.0f, 0.0f, 
+                                        0.0f, 1.0f, 0.0f, 0.0f,
+                                        0.0f, 0.0f, 1.0f, 0.0f, 
+                                        0.0f, 0.0f, 0.0f, 2.5f});
+  renderPlanet(&planet3, 30.0f, 1.0f);
 }
-*/
+
+
+void ApplicationSolar::renderStars() const {
+  glUseProgram(m_shaders.at("stars").handle);
+  glBindVertexArray(star_object.vertex_AO);
+  glPointSize(1.0);
+  glDrawArrays(star_object.draw_mode, 0, (int)m_stars.size());
+}
+
+
+void ApplicationSolar::initializeStars(int numberStars) {
+  std::vector<float> stars(numberStars*6);
+
+  //6 floats for each star: position and colour
+  for(int i = 0; i < numberStars*6; i++) {
+    float random = 0.0f;
+    if((i/3) % 2 == 0) {  //first 3 floats are position
+      random = float(rand() % 200 + (-100));
+    }
+    else {  //second 3 floats are colour
+      random = static_cast <float> (rand()) / static_cast <float> (RAND_MAX);
+    }
+    stars[i] = random;
+  }
+  m_stars = stars;
+}
+
+
 
 ///////////////////////////// callback functions for window events ////////////
 // handle key input
