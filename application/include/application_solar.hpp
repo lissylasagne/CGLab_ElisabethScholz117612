@@ -37,6 +37,8 @@ class ApplicationSolar : public Application {
 
   void renderPlanet(GeometryNode* planet, float distanceFromSun, float speed) const;
   void initializePlanets() const;
+
+  void initializeStars() const;
   
 
   // cpu representation of model

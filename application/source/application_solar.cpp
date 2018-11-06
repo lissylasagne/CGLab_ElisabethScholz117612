@@ -42,6 +42,7 @@ void ApplicationSolar::render() const {
 
   //rendern planets
   initializePlanets();
+  initializeStars();
 
   /*
   // bind shader to upload uniforms
@@ -68,7 +69,6 @@ void ApplicationSolar::render() const {
 
 void ApplicationSolar::renderPlanet(GeometryNode* planet, float distanceFromSun, float speed) const {
   glm::fmat4 model_matrix = planet->getLocalTransform();
-  //model_matrix = glm::scale(model_matrix, size);
   model_matrix = glm::translate(
     glm::rotate(
       model_matrix, 
@@ -114,7 +114,7 @@ void ApplicationSolar::initializePlanets() const{
   planet1.setLocalTransform(glm::fmat4{ 1.0f, 0.0f, 0.0f, 0.0f, 
                                         0.0f, 1.0f, 0.0f, 0.0f,
                                         0.0f, 0.0f, 1.0f, 0.0f, 
-                                        0.0f, 0.0f, 0.0f, 0.2f});
+                                        0.0f, 0.0f, 0.0f, 5.0});
   renderPlanet(&planet1, 10.0f, 2.4f);
 
   GeometryNode planet2{"planet2", unitmat, unitmat, m_planet_model};
@@ -123,15 +123,49 @@ void ApplicationSolar::initializePlanets() const{
                                         0.0f, 1.0f, 0.0f, 0.0f,
                                         0.0f, 0.0f, 1.0f, 0.0f, 
                                         0.0f, 0.0f, 0.0f, 3.5f});
-  renderPlanet(&planet1, 20.0f, 0.5f);
+  renderPlanet(&planet2, 20.0f, 0.5f);
 
-  GeometryNode moon{"moon", unitmat, unitmat, m_planet_model};
-  planet2.addChildren(&moon);
-  moon.setLocalTransform(glm::fmat4{ 1.0f, 0.0f, 0.0f, 0.0f, 
+  GeometryNode planet3{"planet3", unitmat, unitmat, m_planet_model};
+  planet2.addChildren(&planet3);
+  planet3.setLocalTransform(glm::fmat4{ 1.0f, 0.0f, 0.0f, 0.0f, 
                                         0.0f, 1.0f, 0.0f, 0.0f,
                                         0.0f, 0.0f, 1.0f, 0.0f, 
-                                        0.0f, 0.0f, 0.0f, 1.0f});
-  renderPlanet(&moon, 5.0f, 1.0f);
+                                        0.0f, 0.0f, 0.0f, 2.5f});
+  renderPlanet(&planet3, 30.0f, 1.0f);
+}
+
+void ApplicationSolar::initializeStars() const {
+  glm::fmat4 randmat{ 1.0f, 0.0f, 0.0f, 0.0f, 
+                      0.0f, 1.0f, 0.0f, 0.0f,
+                      0.0f, 0.0f, 1.0f, 0.0f, 
+                      0.0f, 0.0f, 0.0f, float(rand() % 200 + (-100))};
+
+  glm::fmat4 unitmat{ 1.0f, 0.0f, 0.0f, 0.0f, 
+                      0.0f, 1.0f, 0.0f, 0.0f,
+                      0.0f, 0.0f, 1.0f, 0.0f, 
+                      0.0f, 0.0f, 0.0f, 1.0f};
+  //create root
+for(int i = 0; i <= 10; i++) {
+    GeometryNode star{"star", randmat, unitmat, m_planet_model};
+
+    glm::fmat4 model_matrix = star.getLocalTransform();
+    model_matrix = glm::translate(
+      model_matrix,
+      glm::fvec3{float(rand() % 200 + (-100)), float(rand() % 200 + (-100)), float(rand() % 200 + (-100))});
+    glUniformMatrix4fv(m_shaders.at("planet").u_locs.at("ModelMatrix"),
+                       1, GL_FALSE, glm::value_ptr(model_matrix));
+
+    // extra matrix for normal transformation to keep them orthogonal to surface
+    glm::fmat4 normal_matrix = glm::inverseTranspose(glm::inverse(m_view_transform) * model_matrix);
+    glUniformMatrix4fv(m_shaders.at("planet").u_locs.at("NormalMatrix"),
+                       1, GL_FALSE, glm::value_ptr(normal_matrix));
+
+    // bind the VAO to draw
+    glBindVertexArray(planet_object.vertex_AO);
+
+    // draw bound vertex array using bound shader
+    glDrawElements(planet_object.draw_mode, planet_object.num_elements, model::INDEX.type, NULL);
+  }
 }
 
 /*
