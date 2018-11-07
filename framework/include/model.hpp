@@ -13,6 +13,7 @@ struct model {
 
   //flag type to combine attributes
   typedef int attrib_flag_t;
+
   // type holding info about a vertex/model attribute
   struct attribute {
 
@@ -52,12 +53,17 @@ struct model {
   static attribute const  INDEX;
   
   model();
-  model(std::vector<GLfloat> const& databuff, attrib_flag_t attribs, std::vector<GLuint> const& trianglebuff = std::vector<GLuint>{});
+  model(
+    std::vector<GLfloat> const& databuff, 
+    attrib_flag_t attribs, 
+    std::vector<GLuint> const& trianglebuff = std::vector<GLuint>{});
 
   std::vector<GLfloat> data;
   std::vector<GLuint> indices;
+
   // byte offsets of individual element attributes
   std::map<attrib_flag_t, GLvoid*> offsets;
+  
   // size of one vertex element in bytes
   GLsizei vertex_bytes;
   std::size_t vertex_num;
