@@ -51,7 +51,7 @@ void ApplicationSolar::render() const {
   renderPlanet(sun);
   renderPlanet(planet1);
   renderPlanet(planet2);
-  renderPlanet(moon);
+  //renderPlanet(moon);
 
 	//Stars
   renderStars();
@@ -105,11 +105,9 @@ void ApplicationSolar::initializeShaderPrograms() {
   m_shaders.at("planet").u_locs["ProjectionMatrix"] = -1;
 
   // store shader program objects in container
-  m_shaders.emplace("stars", shader_program{{{GL_VERTEX_SHADER,m_resource_path + "shaders/stars.vert"},
-                                           {GL_FRAGMENT_SHADER, m_resource_path + "shaders/stars.frag"}}});
+  m_shaders.emplace("stars", shader_program{{{GL_VERTEX_SHADER,m_resource_path + "shaders/vao.vert"},
+                                           {GL_FRAGMENT_SHADER, m_resource_path + "shaders/vao.frag"}}});
   // request uniform locations for shader program
-  m_shaders.at("stars").u_locs["NormalMatrix"] = -1;
-  m_shaders.at("stars").u_locs["ModelMatrix"] = -1;
   m_shaders.at("stars").u_locs["ViewMatrix"] = -1;
   m_shaders.at("stars").u_locs["ProjectionMatrix"] = -1;
 }
@@ -315,8 +313,6 @@ void ApplicationSolar::initializeStars(int numberStars) {
     stars[i] = random;
   }
   m_stars = stars;
-
-    std::cout << m_stars.size() << ' ';
 }
 
 
