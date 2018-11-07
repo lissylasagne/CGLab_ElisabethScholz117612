@@ -35,11 +35,12 @@ class ApplicationSolar : public Application {
   // upload view matrix
   void uploadView();
 
-  void renderPlanet(GeometryNode* planet, float distanceFromSun, float speed) const;
-  void initializePlanets() const;
+  void renderPlanet(GeometryNode* planet) const;
+  void initializePlanets();
 
   void renderStars() const;
   void initializeStars(int numberStars);
+  SceneGraph* getSceneGraph() const;
 
 
   // cpu representation of model

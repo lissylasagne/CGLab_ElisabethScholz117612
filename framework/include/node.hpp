@@ -13,6 +13,7 @@ class Node {
 	public:
 		Node(std::string const& name);
 		Node(Node* parent, std::string const& name, glm::mat4 const& local, glm::mat4 const& world);
+		virtual ~Node();
 		Node* getParent() const;
 		void setParent(Node* parent);
 		Node* getChildren(std::string t_child) const;

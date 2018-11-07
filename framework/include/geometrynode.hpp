@@ -18,9 +18,15 @@ class GeometryNode : public Node{
 			model const& t_model);
 		model getGeometry();
 		void setGeometry(model t_geometry);
+		void setDistance(float t_distance);
+		float getDistance() const;
+		void setSpeed(float t_speed);
+		float getSpeed() const;
 
 	private:
 		model m_geometry;
+		float m_distanceFromOrigin;
+		float m_speed;
 
 };
 

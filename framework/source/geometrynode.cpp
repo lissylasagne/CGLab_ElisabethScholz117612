@@ -24,3 +24,19 @@ model GeometryNode::getGeometry(){
 void GeometryNode::setGeometry(model t_geometry){
  	m_geometry = t_geometry;
 }
+
+void GeometryNode::setDistance(float t_distance) {
+	m_distanceFromOrigin = t_distance;
+}
+
+float GeometryNode::getDistance() const {
+	return m_distanceFromOrigin;
+}
+
+void GeometryNode::setSpeed(float t_speed) {
+	m_speed = t_speed;
+}
+
+float GeometryNode::getSpeed() const {
+	return m_speed;
+}

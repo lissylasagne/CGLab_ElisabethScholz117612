@@ -27,6 +27,8 @@ ApplicationSolar::ApplicationSolar(std::string const& resource_path)
 {
   initializeGeometry();
   initializeShaderPrograms();
+  //initializeScene();
+  initializePlanets();
   initializeStars(100);
 }
 
@@ -42,7 +44,15 @@ void ApplicationSolar::render() const {
   glUseProgram(m_shaders.at("planet").handle);
 
   //rendern pmlanets
-  initializePlanets();
+  GeometryNode* sun = dynamic_cast<GeometryNode*>(m_scene.getRoot()->getChildren("sun"));
+  GeometryNode* planet1 = dynamic_cast<GeometryNode*>(sun->getChildren("planet1"));
+  GeometryNode* planet2 = dynamic_cast<GeometryNode*>(sun->getChildren("planet2"));
+  GeometryNode* moon = dynamic_cast<GeometryNode*>(planet2->getChildren("moon"));
+  renderPlanet(sun);
+  renderPlanet(planet1);
+  renderPlanet(planet2);
+  //renderPlanet(&planet3);
+  renderPlanet(moon);
   //renderStars();
 }
 
@@ -123,7 +133,7 @@ void ApplicationSolar::initializeGeometry() {
 
 
   //star geometry
-  model star_model = model_loader::obj(m_resource_path + "models/sphere.obj", model::NORMAL);
+  model star_model = model{m_stars, (model::POSITION + model::NORMAL), {0}};
 
   // generate vertex array object
   glGenVertexArrays(1, &star_object.vertex_AO);
@@ -165,14 +175,25 @@ void ApplicationSolar::initializeScene() {
   m_scene = SceneGraph("scene", root);
 }
 
-void ApplicationSolar::renderPlanet(GeometryNode* planet, float distanceFromSun, float speed) const {
-  glm::fmat4 model_matrix = planet->getLocalTransform();
+void ApplicationSolar::renderPlanet(GeometryNode* planet) const {
+  glm::fmat4 model_matrix = glm::fmat4{1.0};
+   
+   if(planet->getName() == "moon") { 
+    model_matrix = planet->getParent()->getLocalTransform();
+    model_matrix = glm::translate(
+      glm::rotate(
+        model_matrix, 
+        float(glfwGetTime())* dynamic_cast<GeometryNode*>(planet->getParent())->getSpeed(), 
+        glm::fvec3{0.0f, 1.0f, 0.0f}),
+      glm::fvec3{dynamic_cast<GeometryNode*>(planet->getParent())->getDistance(), 0.0f, 0.0f});
+  }
+
   model_matrix = glm::translate(
     glm::rotate(
       model_matrix, 
-      float(glfwGetTime())*speed, 
+      float(glfwGetTime())*planet->getSpeed(), 
       glm::fvec3{0.0f, 1.0f, 0.0f}),
-    glm::fvec3{distanceFromSun, 0.0f, 0.0f});
+    glm::fvec3{planet->getDistance(), 0.0f, 0.0f});
   glUniformMatrix4fv(m_shaders.at("planet").u_locs.at("ModelMatrix"),
                      1, GL_FALSE, glm::value_ptr(model_matrix));
 
@@ -191,46 +212,52 @@ void ApplicationSolar::renderPlanet(GeometryNode* planet, float distanceFromSun,
 
 
 //iterate trough the SceneGraph and transform and render the Planets
-void ApplicationSolar::initializePlanets() const{
-
-  std::cout << "initializing scene\n";
-
+void ApplicationSolar::initializePlanets() {
+  
   glm::fmat4 unitmat{ 1.0f, 0.0f, 0.0f, 0.0f, 
                       0.0f, 1.0f, 0.0f, 0.0f,
                       0.0f, 0.0f, 1.0f, 0.0f, 
                       0.0f, 0.0f, 0.0f, 1.0f};
   //create root
-  Node root{"root"};
+  Node* root = new Node("root");
+  m_scene = SceneGraph("scene", root);
 
   //create structure of solar system in scenegraph
-  GeometryNode sun{"sun", unitmat, unitmat, m_planet_model};
-  root.addChildren(&sun);
+  //GeometryNode sun{"sun", unitmat, unitmat, m_planet_model};
+  GeometryNode* sun = new GeometryNode("sun", unitmat, unitmat, m_planet_model);
 
-  renderPlanet(&sun, 0.0f, 1.0f);
+  root->addChildren(sun);
+  sun->setDistance(0.0f);
+  sun->setSpeed(1.0f);
 
-  GeometryNode planet1{"planet1", unitmat, unitmat, m_planet_model};
-  sun.addChildren(&planet1);
-  planet1.setLocalTransform(glm::fmat4{ 1.0f, 0.0f, 0.0f, 0.0f, 
+  GeometryNode* planet1 = new GeometryNode("planet1", unitmat, unitmat, m_planet_model);
+  sun->addChildren(planet1);
+  planet1->setLocalTransform(glm::fmat4{ 1.0f, 0.0f, 0.0f, 0.0f, 
                                         0.0f, 1.0f, 0.0f, 0.0f,
                                         0.0f, 0.0f, 1.0f, 0.0f, 
                                         0.0f, 0.0f, 0.0f, 5.0});
-  renderPlanet(&planet1, 10.0f, 2.4f);
+  planet1->setDistance(10.0f);
+  planet1->setSpeed(2.4f);
 
-  GeometryNode planet2{"planet2", unitmat, unitmat, m_planet_model};
-  sun.addChildren(&planet2);
-  planet2.setLocalTransform(glm::fmat4{ 1.0f, 0.0f, 0.0f, 0.0f, 
+
+  GeometryNode* planet2 = new GeometryNode("planet2", unitmat, unitmat, m_planet_model);
+  sun->addChildren(planet2);
+  planet1->setLocalTransform(glm::fmat4{ 1.0f, 0.0f, 0.0f, 0.0f, 
                                         0.0f, 1.0f, 0.0f, 0.0f,
                                         0.0f, 0.0f, 1.0f, 0.0f, 
-                                        0.0f, 0.0f, 0.0f, 3.5f});
-  renderPlanet(&planet2, 20.0f, 0.5f);
+                                        0.0f, 0.0f, 0.0f, 5.0});
+  planet1->setDistance(20.0f);
+  planet1->setSpeed(0.5f);
 
-  GeometryNode planet3{"planet3", unitmat, unitmat, m_planet_model};
-  planet2.addChildren(&planet3);
-  planet3.setLocalTransform(glm::fmat4{ 1.0f, 0.0f, 0.0f, 0.0f, 
+
+  GeometryNode* moon = new GeometryNode("moon", unitmat, unitmat, m_planet_model);
+  planet2->addChildren(moon);
+  moon->setLocalTransform(glm::fmat4{ 1.0f, 0.0f, 0.0f, 0.0f, 
                                         0.0f, 1.0f, 0.0f, 0.0f,
                                         0.0f, 0.0f, 1.0f, 0.0f, 
-                                        0.0f, 0.0f, 0.0f, 2.5f});
-  renderPlanet(&planet3, 30.0f, 1.0f);
+                                        0.0f, 0.0f, 0.0f, 5.0});
+  moon->setDistance(5.0f);
+  moon->setSpeed(1.0f);
 }
 
 

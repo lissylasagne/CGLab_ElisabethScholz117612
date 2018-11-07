@@ -60,6 +60,10 @@ Node::Node(Node* parent, std::string const& name, glm::mat4 const& local,
 	m_parent -> addChildren(this);
 }
 
+Node::~Node() {
+	std::cout << "~Node() is executed\n"; 
+}
+
 Node* Node::getParent() const {
 	return m_parent;
 }
