@@ -51,7 +51,6 @@ void ApplicationSolar::render() const {
   renderPlanet(sun);
   renderPlanet(planet1);
   renderPlanet(planet2);
-  //renderPlanet(&planet3);
   renderPlanet(moon);
 
 	//Stars
@@ -78,7 +77,6 @@ void ApplicationSolar::uploadProjection() {
   glUseProgram(m_shaders.at("planet").handle);
   glUniformMatrix4fv(m_shaders.at("planet").u_locs.at("ProjectionMatrix"),
                      1, GL_FALSE, glm::value_ptr(m_view_projection));
-
 	glUseProgram(m_shaders.at("stars").handle);
   glUniformMatrix4fv(m_shaders.at("stars").u_locs.at("ProjectionMatrix"),
                      1, GL_FALSE, glm::value_ptr(m_view_projection));
@@ -90,8 +88,6 @@ void ApplicationSolar::uploadUniforms() {
   in the functions that upload View and Projection for shader
   glUseProgram(m_shaders.at("planet").handle);
   */
-  
-  // upload uniform values to new locations
   uploadView();
   uploadProjection();
 }
@@ -107,6 +103,15 @@ void ApplicationSolar::initializeShaderPrograms() {
   m_shaders.at("planet").u_locs["ModelMatrix"] = -1;
   m_shaders.at("planet").u_locs["ViewMatrix"] = -1;
   m_shaders.at("planet").u_locs["ProjectionMatrix"] = -1;
+
+  // store shader program objects in container
+  m_shaders.emplace("stars", shader_program{{{GL_VERTEX_SHADER,m_resource_path + "shaders/stars.vert"},
+                                           {GL_FRAGMENT_SHADER, m_resource_path + "shaders/stars.frag"}}});
+  // request uniform locations for shader program
+  m_shaders.at("stars").u_locs["NormalMatrix"] = -1;
+  m_shaders.at("stars").u_locs["ModelMatrix"] = -1;
+  m_shaders.at("stars").u_locs["ViewMatrix"] = -1;
+  m_shaders.at("stars").u_locs["ProjectionMatrix"] = -1;
 }
 
 // load models
@@ -283,10 +288,19 @@ void ApplicationSolar::renderStars() const {
   glBindVertexArray(star_object.vertex_AO);
   glPointSize(1.0);
   glDrawArrays(star_object.draw_mode, 0, (int)m_stars.size());
+  //glDrawElements(star_object.draw_mode, (int)m_stars.size(), model::INDEX.type, NULL);
+
 }
 
 
 void ApplicationSolar::initializeStars(int numberStars) {
+  glm::fmat4 unitmat{ 1.0f, 0.0f, 0.0f, 0.0f, 
+                      0.0f, 1.0f, 0.0f, 0.0f,
+                      0.0f, 0.0f, 1.0f, 0.0f, 
+                      0.0f, 0.0f, 0.0f, 1.0f};
+  GeometryNode* starNode = new GeometryNode("stars", unitmat, unitmat, m_star_model);
+  m_scene.getRoot()->addChildren(starNode);
+
   std::vector<float> stars(numberStars*6);
 
   //6 floats for each star: position and colour
@@ -301,6 +315,8 @@ void ApplicationSolar::initializeStars(int numberStars) {
     stars[i] = random;
   }
   m_stars = stars;
+
+    std::cout << m_stars.size() << ' ';
 }
 
 

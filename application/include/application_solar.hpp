@@ -58,6 +58,7 @@ class ApplicationSolar : public Application {
   SceneGraph m_scene;
   std::vector<float> m_stars;
   model m_planet_model;
+  model m_star_model;
 
 };
 
