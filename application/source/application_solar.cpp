@@ -263,8 +263,6 @@ void ApplicationSolar::initializeStars(int numberStars) {
     float random = 0.0f;
     if((i/3) % 2 == 0) {  //first 3 floats are position
       random = float(rand() % 200 + (-100));
-      std::cout << random;
-      std::cout << "_";
     }
     else {  //second 3 floats are colour
       random = static_cast <float> (rand()) / static_cast <float> (RAND_MAX);
@@ -333,6 +331,7 @@ void ApplicationSolar::renderStars() const {
   glUseProgram(m_shaders.at("stars").handle);
   glBindVertexArray(star_object.vertex_AO);
   glPointSize(1.0);
+  // draw bound vertex array using bound shader
   glDrawArrays(star_object.draw_mode, 0, (int)m_stars.size());
 }
 
