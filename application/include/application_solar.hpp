@@ -27,7 +27,8 @@ class ApplicationSolar : public Application {
  protected:
   //initialization
   void initializeShaderPrograms();
-  void initializeGeometry();
+  void initializePlanetGeometry();
+  void initializeStarGeometry();
   void initializePlanets();
   void initializeStars(int numberStars);
 
