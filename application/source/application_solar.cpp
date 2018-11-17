@@ -28,7 +28,7 @@ ApplicationSolar::ApplicationSolar(std::string const& resource_path)
   initializeGeometry();
   initializeShaderPrograms();
   initializePlanets();
-  initializeStars(100);
+  initializeStars(10);
 }
 
 ApplicationSolar::~ApplicationSolar() {
@@ -208,7 +208,7 @@ void ApplicationSolar::renderPlanet(GeometryNode* planet) const {
   model_matrix = glm::translate(
     glm::rotate(
       model_matrix, 
-      float(glfwGetTime())*planet->getSpeed(), 
+      float(glfwGetTime())*planet->getSpeed(),
       glm::fvec3{0.0f, 1.0f, 0.0f}),
     glm::fvec3{planet->getDistance(), 0.0f, 0.0f});
 
@@ -256,7 +256,7 @@ void ApplicationSolar::initializePlanets() {
                                         0.0f, 1.0f, 0.0f, 0.0f,
                                         0.0f, 0.0f, 1.0f, 0.0f, 
                                         0.0f, 0.0f, 0.0f, 2.0});
-  planet1->setDistance(10.0f);
+  planet1->setDistance(20.0f);
   planet1->setSpeed(2.4f);
 
 
@@ -265,8 +265,8 @@ void ApplicationSolar::initializePlanets() {
   planet1->setLocalTransform(glm::fmat4{ 1.0f, 0.0f, 0.0f, 0.0f, 
                                         0.0f, 1.0f, 0.0f, 0.0f,
                                         0.0f, 0.0f, 1.0f, 0.0f, 
-                                        0.0f, 0.0f, 0.0f, 5.0});
-  planet1->setDistance(20.0f);
+                                        0.0f, 0.0f, 0.0f, 2.5});
+  planet1->setDistance(30.0f);
   planet1->setSpeed(0.5f);
 
 
@@ -305,12 +305,13 @@ void ApplicationSolar::initializeStars(int numberStars) {
   for(int i = 0; i < numberStars*6; i++) {
     float random = 0.0f;
     if((i/3) % 2 == 0) {  //first 3 floats are position
-      random = float(rand() % 200 + (-100));
+      random = static_cast <float> (rand() % 100 + (-50));
     }
     else {  //second 3 floats are colour
       random = static_cast <float> (rand()) / static_cast <float> (RAND_MAX);
     }
     stars[i] = random;
+   // std::cout << stars[i] << " ";
   }
   m_stars = stars;
 }
