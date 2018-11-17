@@ -25,8 +25,13 @@ class ApplicationSolar : public Application {
   void render() const;
 
  protected:
+  //initialization
   void initializeShaderPrograms();
-  void initializeGeometry();
+  void initializePlanetGeometry();
+  void initializeStarGeometry();
+  void initializePlanets();
+  void initializeStars(int numberStars);
+
   // update uniform values
   void uploadUniforms();
   // upload projection matrix
@@ -34,13 +39,13 @@ class ApplicationSolar : public Application {
   // upload view matrix
   void uploadView();
 
+  //rendering
+  void renderPlanets() const;
   void renderPlanet(GeometryNode* planet) const;
-  void initializePlanets();
-
   void renderStars() const;
-  void initializeStars(int numberStars);
-  SceneGraph* getSceneGraph() const;
 
+  //misc
+  SceneGraph* getSceneGraph() const;
 
   // cpu representation of model
   model_object planet_object;
