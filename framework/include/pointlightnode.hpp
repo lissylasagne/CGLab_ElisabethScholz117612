@@ -11,11 +11,9 @@ using namespace gl;
 class PointLightNode : public Node{
 	public:
 		PointLightNode(Node* t_parent, std::string const& t_name,
-			glm::mat4 const& t_local, glm::mat4 const& t_world,
-			model const& t_model);
+			glm::mat4 const& t_local, glm::mat4 const& t_world);
 		PointLightNode(std::string const& t_name,
-			glm::mat4 const& t_local, glm::mat4 const& t_world,
-			model const& t_model);
+			glm::mat4 const& t_local, glm::mat4 const& t_world);
 
 		void setIntensity(float t_intensity);
 		float getIntensity() const;

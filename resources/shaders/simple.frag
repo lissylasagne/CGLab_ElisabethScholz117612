@@ -1,6 +1,7 @@
 #version 150
 
 in  vec3 pass_Normal;
+in vec3 pass_color;
 out vec4 out_Color;
 
 void main() {
