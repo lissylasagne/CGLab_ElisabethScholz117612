@@ -313,7 +313,7 @@ void ApplicationSolar::renderPlanet(GeometryNode* planet) const {
   glUniformMatrix4fv(m_shaders.at("planet").u_locs.at("ModelMatrix"),
                      1, GL_FALSE, glm::value_ptr(model_matrix));
 
-  glm::fvec3 planetColor = {0.0f, 1.0f, 1.0f};
+  glm::fvec3 planetColor = {0.0f, 0.1f, 1.0f};
   glUniform3f(m_shaders.at("planet").u_locs.at("PlanetColor"), planetColor.x, planetColor.y, planetColor.z);
 
   // extra matrix for normal transformation to keep them orthogonal to surface
