@@ -228,6 +228,7 @@ void ApplicationSolar::initializePlanets() {
   root->addChildren(sun);
   sun->setDistance(0.0f);
   sun->setSpeed(1.0f);
+  sun->setColor(glm::fvec3{1.0f,1.0f,0.0f});
 
   GeometryNode* planet1 = new GeometryNode("planet1", unitmat, unitmat, m_planet_model);
   sun->addChildren(planet1);
@@ -237,16 +238,17 @@ void ApplicationSolar::initializePlanets() {
                                         0.0f, 0.0f, 0.0f, 2.0});
   planet1->setDistance(20.0f);
   planet1->setSpeed(2.4f);
-
+  planet1->setColor(glm::fvec3{1.0f,0.0f,1.0f});
 
   GeometryNode* planet2 = new GeometryNode("planet2", unitmat, unitmat, m_planet_model);
   sun->addChildren(planet2);
-  planet1->setLocalTransform(glm::fmat4{ 1.0f, 0.0f, 0.0f, 0.0f, 
+  planet2->setLocalTransform(glm::fmat4{ 1.0f, 0.0f, 0.0f, 0.0f, 
                                         0.0f, 1.0f, 0.0f, 0.0f,
                                         0.0f, 0.0f, 1.0f, 0.0f, 
                                         0.0f, 0.0f, 0.0f, 2.5});
-  planet1->setDistance(30.0f);
-  planet1->setSpeed(0.5f);
+  planet2->setDistance(30.0f);
+  planet2->setSpeed(0.5f);
+  planet2->setColor(glm::fvec3{1.0f,1.0f,1.0f});
 
 
   GeometryNode* moon = new GeometryNode("moon", unitmat, unitmat, m_planet_model);
@@ -257,6 +259,7 @@ void ApplicationSolar::initializePlanets() {
                                         0.0f, 0.0f, 0.0f, 5.0});
   moon->setDistance(5.0f);
   moon->setSpeed(1.0f);
+  moon->setColor(glm::fvec3{1.0f,1.0f,0.0f});
 }
 
 void ApplicationSolar::initializeStars(int numberStars) {
@@ -313,7 +316,7 @@ void ApplicationSolar::renderPlanet(GeometryNode* planet) const {
   glUniformMatrix4fv(m_shaders.at("planet").u_locs.at("ModelMatrix"),
                      1, GL_FALSE, glm::value_ptr(model_matrix));
 
-  glm::fvec3 planetColor = {0.0f, 0.1f, 1.0f};
+  glm::fvec3 planetColor = planet->getColor();
   glUniform3f(m_shaders.at("planet").u_locs.at("PlanetColor"), planetColor.x, planetColor.y, planetColor.z);
 
   // extra matrix for normal transformation to keep them orthogonal to surface

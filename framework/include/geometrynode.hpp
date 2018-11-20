@@ -22,11 +22,14 @@ class GeometryNode : public Node{
 		float getDistance() const;
 		void setSpeed(float t_speed);
 		float getSpeed() const;
+		void setColor(glm::fvec3 t_color);
+		glm::fvec3 getColor() const;
 
 	private:
 		model m_geometry;
 		float m_distanceFromOrigin;
 		float m_speed;
+		glm::fvec3 m_color;
 
 };
 

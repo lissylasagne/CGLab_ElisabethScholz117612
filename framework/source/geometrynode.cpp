@@ -40,3 +40,11 @@ void GeometryNode::setSpeed(float t_speed) {
 float GeometryNode::getSpeed() const {
 	return m_speed;
 }
+
+void GeometryNode::setColor(glm::fvec3 t_color) {
+	m_color = t_color;
+}
+
+glm::fvec3 GeometryNode::getColor() const{
+	return m_color;
+}
