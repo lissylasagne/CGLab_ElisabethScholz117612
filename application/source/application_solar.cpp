@@ -105,8 +105,8 @@ void ApplicationSolar::initializeShaderPrograms() {
   //PLANETS
 
   // store shader program objects in container
-  m_shaders.emplace("planet", shader_program{{{GL_VERTEX_SHADER,m_resource_path + "shaders/simple.vert"},
-                                           {GL_FRAGMENT_SHADER, m_resource_path + "shaders/simple.frag"}}});
+  m_shaders.emplace("planet", shader_program{{{GL_VERTEX_SHADER,m_resource_path + "shaders/planet.vert"},
+                                           {GL_FRAGMENT_SHADER, m_resource_path + "shaders/planet.frag"}}});
   // request uniform locations for shader program
   m_shaders.at("planet").u_locs["NormalMatrix"] = -1;
   m_shaders.at("planet").u_locs["ModelMatrix"] = -1;
