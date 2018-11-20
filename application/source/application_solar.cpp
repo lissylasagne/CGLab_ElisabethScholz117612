@@ -19,9 +19,6 @@ using namespace gl;
 
 #include <iostream>
 
-// CHANGE: initGeometry() AFTER initStars() -> if we init the geometry with an
-// empty vector, of course there won't be any stars to render
-
 ApplicationSolar::ApplicationSolar(std::string const& resource_path)
  :Application{resource_path}
  ,planet_object{}
@@ -108,11 +105,18 @@ void ApplicationSolar::initializeShaderPrograms() {
   m_shaders.emplace("planet", shader_program{{{GL_VERTEX_SHADER,m_resource_path + "shaders/planet.vert"},
                                            {GL_FRAGMENT_SHADER, m_resource_path + "shaders/planet.frag"}}});
   // request uniform locations for shader program
+  
+  //simple shader uniforms
   m_shaders.at("planet").u_locs["NormalMatrix"] = -1;
   m_shaders.at("planet").u_locs["ModelMatrix"] = -1;
-  m_shaders.at("planet").u_locs["ViewMatrix"] = -1;
+  m_shaders.at("planet").u_locs["ViewMatrix"] = -1; // = daraus camera position ableiten?
   m_shaders.at("planet").u_locs["ProjectionMatrix"] = -1;
-  m_shaders.at("planet").u_locs["PlanetColor"] = -1;
+  m_shaders.at("planet").u_locs["PlanetColor"] = -1; // = diffuse and ambient color
+
+  //planet shader specific uniforms
+  m_shaders.at("planet").u_locs["LightPosition"] = -1;
+  m_shaders.at("planet").u_locs["LightColor"] = -1;
+  m_shaders.at("planet").u_locs["LightIntensity"] = -1;
 
   //STARS
 
@@ -368,6 +372,10 @@ void ApplicationSolar::keyCallback(int key, int action, int mods) {
     m_view_transform = glm::translate(m_view_transform, glm::fvec3{-0.1f, 0.0f, 0.0f});
     uploadView();
   } //right; negative x direction
+  else if(key == GLFW_KEY_1 && (action == GLFW_PRESS || action == GLFW_REPEAT)) {
+    m_shading_mode = "";
+  }
+  //TODO handle switching of shaders
 }
 
 //handle delta mouse movement input
