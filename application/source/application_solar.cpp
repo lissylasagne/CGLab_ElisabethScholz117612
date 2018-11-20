@@ -372,9 +372,11 @@ void ApplicationSolar::keyCallback(int key, int action, int mods) {
     m_view_transform = glm::translate(m_view_transform, glm::fvec3{-0.1f, 0.0f, 0.0f});
     uploadView();
   } //right; negative x direction
+  /*
   else if(key == GLFW_KEY_1 && (action == GLFW_PRESS || action == GLFW_REPEAT)) {
     m_shading_mode = "";
   }
+  */
   //TODO handle switching of shaders
 }
 
