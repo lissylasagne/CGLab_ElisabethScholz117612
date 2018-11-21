@@ -19,6 +19,7 @@ uniform float LightIntensity;
 // OUT
 out vec3 pass_Normal;
 out vec3 pass_VertexPosition; // is in camera-space?
+
 out vec3 pass_Color;
 out vec3 pass_LightPosition;
 out vec3 pass_LightColor;
@@ -50,5 +51,4 @@ void main(void)
 	pass_LightColor = LightColor;
 	pass_LightIntensity = LightIntensity;
 }
-
 
