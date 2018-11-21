@@ -16,6 +16,8 @@ uniform vec3 LightPosition;
 uniform vec3 LightColor;
 uniform float LightIntensity;
 
+uniform int ShaderMode;
+
 // OUT
 out vec3 pass_Normal;
 out vec3 pass_VertexPosition; // is in camera-space?
@@ -24,6 +26,8 @@ out vec3 pass_Color;
 out vec3 pass_LightPosition;
 out vec3 pass_LightColor;
 out float pass_LightIntensity;
+
+flat out int pass_ShaderMode;
 
 void main(void)
 {
@@ -50,5 +54,8 @@ void main(void)
 	pass_LightPosition = (ViewMatrix*vec4(LightPosition,1.0f)).xyz;
 	pass_LightColor = LightColor;
 	pass_LightIntensity = LightIntensity;
+
+	pass_ShaderMode = ShaderMode;
 }
+
 

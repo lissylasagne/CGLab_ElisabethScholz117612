@@ -24,7 +24,7 @@ ApplicationSolar::ApplicationSolar(std::string const& resource_path)
  ,planet_object{}
  ,m_view_transform{glm::translate(glm::fmat4{}, glm::fvec3{0.0f, 0.0f, 40.0f})}
  ,m_view_projection{utils::calculate_projection_matrix(initial_aspect_ratio)}
- ,m_shading_mode{"planet_blinn_phong"}
+ ,m_shading_mode{"blinn_phong"}
 {
   // init for Planets - for some reason, only sun + one planet are rendered if
   // initPlanets() is dome before initGeometry() ???
@@ -62,8 +62,8 @@ void ApplicationSolar::uploadView() {
   // upload matrix to gpu
 
   //PLANETS
-  glUseProgram(m_shaders.at(m_shading_mode).handle);
-  glUniformMatrix4fv(m_shaders.at(m_shading_mode).u_locs.at("ViewMatrix"),
+  glUseProgram(m_shaders.at("planet").handle);
+  glUniformMatrix4fv(m_shaders.at("planet").u_locs.at("ViewMatrix"),
                      1, GL_FALSE, glm::value_ptr(view_matrix));
 
   //STARS
@@ -76,8 +76,8 @@ void ApplicationSolar::uploadProjection() {
   // upload matrix to gpu
 
   //PLANETS
-  glUseProgram(m_shaders.at(m_shading_mode).handle);
-  glUniformMatrix4fv(m_shaders.at(m_shading_mode).u_locs.at("ProjectionMatrix"),
+  glUseProgram(m_shaders.at("planet").handle);
+  glUniformMatrix4fv(m_shaders.at("planet").u_locs.at("ProjectionMatrix"),
                      1, GL_FALSE, glm::value_ptr(m_view_projection));
   //STARS
 	glUseProgram(m_shaders.at("stars").handle);
@@ -99,29 +99,26 @@ void ApplicationSolar::uploadUniforms() {
 
 // load shader sources
 void ApplicationSolar::initializeShaderPrograms() {
-  
-  //PLANETS
-
-  //shader path
-  std::string fragShaderPath = "shaders/" + m_shading_mode + ".frag";
-  std::string vertShaderPath = "shaders/" + m_shading_mode + ".vert";
-
+  //blinn phong
   // store shader program objects in container
-  m_shaders.emplace(m_shading_mode, shader_program{{{GL_VERTEX_SHADER,m_resource_path + vertShaderPath},
-                                           {GL_FRAGMENT_SHADER, m_resource_path + fragShaderPath}}});
+  m_shaders.emplace("planet", shader_program{{{GL_VERTEX_SHADER,m_resource_path + "shaders/planet.vert"},
+                                           {GL_FRAGMENT_SHADER, m_resource_path + "shaders/planet.frag"}}});
   // request uniform locations for shader program
   
   //simple shader uniforms
-  m_shaders.at(m_shading_mode).u_locs["NormalMatrix"] = -1;
-  m_shaders.at(m_shading_mode).u_locs["ModelMatrix"] = -1;
-  m_shaders.at(m_shading_mode).u_locs["ViewMatrix"] = -1; // = daraus camera position ableiten?
-  m_shaders.at(m_shading_mode).u_locs["ProjectionMatrix"] = -1;
-  m_shaders.at(m_shading_mode).u_locs["PlanetColor"] = -1; // = diffuse and ambient color
+  m_shaders.at("planet").u_locs["NormalMatrix"] = -1;
+  m_shaders.at("planet").u_locs["ModelMatrix"] = -1;
+  m_shaders.at("planet").u_locs["ViewMatrix"] = -1; // = daraus camera position ableiten?
+  m_shaders.at("planet").u_locs["ProjectionMatrix"] = -1;
+  m_shaders.at("planet").u_locs["PlanetColor"] = -1; // = diffuse and ambient color
 
   //planet shader specific uniforms
-  m_shaders.at(m_shading_mode).u_locs["LightPosition"] = -1;
-  m_shaders.at(m_shading_mode).u_locs["LightColor"] = -1;
-  m_shaders.at(m_shading_mode).u_locs["LightIntensity"] = -1;
+  m_shaders.at("planet").u_locs["LightPosition"] = -1;
+  m_shaders.at("planet").u_locs["LightColor"] = -1;
+  m_shaders.at("planet").u_locs["LightIntensity"] = -1;
+
+  //ShaderMode uniform
+  m_shaders.at("planet").u_locs["ShaderMode"] = -1;
 
   //STARS
 
@@ -242,7 +239,7 @@ void ApplicationSolar::initializePlanets() {
   root->addChildren(sun);
   sun->setDistance(0.0f);
   sun->setSpeed(1.0f);
-  sun->setSize(10.0f);
+  sun->setSize(4.0f);
   sun->setColor(yellow); //yellow
 
   GeometryNode* planet1 = new GeometryNode("planet1", unitmat, unitmat, m_planet_model);
@@ -268,7 +265,7 @@ void ApplicationSolar::initializePlanets() {
 
   PointLightNode* sunlight = new PointLightNode("sunlight", unitmat, unitmat);
   root->addChildren(sunlight);
-  sunlight->setIntensity(0.2f);
+  sunlight->setIntensity(0.6f);
   sunlight->setColor(white);
 }
 
@@ -289,7 +286,7 @@ void ApplicationSolar::initializeStars(int numberStars) {
 
 //deal with traversing the SceneGraph
 void ApplicationSolar::renderPlanets() const{
-	glUseProgram(m_shaders.at(m_shading_mode).handle);
+	glUseProgram(m_shaders.at("planet").handle);
 
   GeometryNode* sun = dynamic_cast<GeometryNode*>(m_scene.getRoot()->getChildren("sun"));
   GeometryNode* planet1 = dynamic_cast<GeometryNode*>(sun->getChildren("planet1"));
@@ -305,9 +302,10 @@ void ApplicationSolar::renderPlanets() const{
 void ApplicationSolar::renderPlanet(GeometryNode* planet) const {
   glm::fmat4 model_matrix = glm::fmat4{1.0};
   
-  model_matrix = glm::scale(model_matrix, glm::fvec3(planet->getSize()));
   //TODO
   //the moon specific transformation should be shifted to updating the world_transformation with the parents and local transformations
+  //scaling klappt nicht so richtig... 
+  //model_matrix = glm::scale(model_matrix, glm::fvec3(planet->getSize()));
 
   // if the planet is a moon, then the transformations to the parent planets position need to happen first
   if(planet->getName() == "moon") { 
@@ -327,25 +325,32 @@ void ApplicationSolar::renderPlanet(GeometryNode* planet) const {
   model_matrix = glm::translate(model_matrix, glm::fvec3{planet->getDistance(), 0.0f, 0.0f});
 
   // give model_matrix to shader
-  glUniformMatrix4fv(m_shaders.at(m_shading_mode).u_locs.at("ModelMatrix"),
+  glUniformMatrix4fv(m_shaders.at("planet").u_locs.at("ModelMatrix"),
                      1, GL_FALSE, glm::value_ptr(model_matrix));
 
   glm::fvec3 planetColor = planet->getColor();
-  glUniform3f(m_shaders.at(m_shading_mode).u_locs.at("PlanetColor"), planetColor.x, planetColor.y, planetColor.z);
+  glUniform3f(m_shaders.at("planet").u_locs.at("PlanetColor"), planetColor.x, planetColor.y, planetColor.z);
 
   // extra matrix for normal transformation to keep them orthogonal to surface
   glm::fmat4 normal_matrix = glm::inverseTranspose(glm::inverse(m_view_transform) * model_matrix);
   //give normal matrix to shader
-  glUniformMatrix4fv(m_shaders.at(m_shading_mode).u_locs.at("NormalMatrix"),
+  glUniformMatrix4fv(m_shaders.at("planet").u_locs.at("NormalMatrix"),
                      1, GL_FALSE, glm::value_ptr(normal_matrix));
 
   //give sunlight data to shader
-
   PointLightNode* sunlightNode = dynamic_cast<PointLightNode*>(m_scene.getRoot()->getChildren("sunlight"));
   glm::fvec3 lightColor = sunlightNode->getColor();
-  glUniform3f(m_shaders.at(m_shading_mode).u_locs.at("LightPosition"), 0.0f, 0.0f, 0.0f);
-  glUniform1f(m_shaders.at(m_shading_mode).u_locs.at("LightIntensity"), sunlightNode->getIntensity());
-  glUniform3f(m_shaders.at(m_shading_mode).u_locs.at("LightColor"), lightColor.x, lightColor.y, lightColor.z);
+  glUniform3f(m_shaders.at("planet").u_locs.at("LightPosition"), 0.0f, 0.0f, 0.0f);
+  glUniform1f(m_shaders.at("planet").u_locs.at("LightIntensity"), sunlightNode->getIntensity());
+  glUniform3f(m_shaders.at("planet").u_locs.at("LightColor"), lightColor.x, lightColor.y, lightColor.z);
+
+  //give shadermode to shader
+  if(m_shading_mode == "blinn_phong"){
+    glUniform1i(m_shaders.at("planet").u_locs.at("ShaderMode"), 1); 
+  }
+  else{
+    glUniform1i(m_shaders.at("planet").u_locs.at("ShaderMode"), 2);
+  }
 
   // bind the VAO to draw
   glBindVertexArray(planet_object.vertex_AO);
@@ -392,11 +397,15 @@ void ApplicationSolar::keyCallback(int key, int action, int mods) {
   } //right; negative x direction
   
   else if(key == GLFW_KEY_1 && (action == GLFW_PRESS || action == GLFW_REPEAT)) {
-    m_shading_mode = "planet_blinn_phong";
+    m_shading_mode = "blinn_phong";
+    uploadView();
+    uploadProjection();
   }
 
   else if(key == GLFW_KEY_2 && (action == GLFW_PRESS || action == GLFW_REPEAT)) {
-    m_shading_mode = "planet_cel_shading";
+    m_shading_mode = "cel_shading";
+    uploadView();
+    uploadProjection();
   }
 }
 
