@@ -1,46 +1,57 @@
 #version 150
 
-//in vec3 pass_Normal;
+//IN
+in vec3 pass_Normal;
+in vec3 pass_VertexPosition;
 in vec3 pass_Color;
 
-in vec3 pass_vert_position;
-in vec3 pass_cam_direction;
+in vec3 pass_LightPosition;
+in vec3 pass_LightColor;
+in float pass_LightIntensity;
 
+// OUT
 out vec4 out_Color;
 
 void main() {
-  vec3 light_position = vec3(0,0,0);
-  vec3 light_color = vec3(1.0,1.0,1.0);
-  float light_power = 30.0;
-  vec3 ambient_color = vec3(0.1,0.0,0.0);
-  vec3 diffuse_color = vec3(0.5,0.0,0.0);
-  vec3 specular_color = vec3(1.0,1.0,1.0); //spekulatius
-  float shininess = 16.0;
-  float screen_gamma= 2.2;
+	// Const
+	float pi = 3.1415926;
+	
+	// Parameters
+	vec3 ambient_color = pass_Color.xyz;
+	vec3 diffuse_color = pass_Color;
+	vec3 specular_color = vec3(1.0f,1.0f,1.0f);
 
-  //get rays and geometry:
-  vec3 normal = normalize(pass_cam_direction);
-  vec3 light_direction = normalize(light_position - pass_vert_position);
-  float distance = length(light_direction);
-  distance = distance * distance;
+	//rho
+	float reflectivity = 0.9;
+	//4*alpha
+	float glossiness = 32;
 
-  float lambertian = max(dot(light_direction, normal), 0.0);
-  float specular = 0.0;
+	// Vectors
+	// Normal on Surface Vector
+	vec3 N = normalize(pass_Normal);
 
-  if(lambertian > 0.0) {
+	// Light-Vertex-Vector
+	vec3 L = normalize(pass_LightPosition - pass_VertexPosition);
 
-    vec3 view_direction = normalize(-pass_vert_position);
+	// Vertex-to-Camera-Vector
+	vec3 V = normalize(-pass_VertexPosition);
 
-    // this is blinn phong
-    vec3 half_direction = normalize(light_direction + view_direction);
-    float specular_angle = max(dot(half_direction, normal), 0.0);
-    specular = pow(specular_angle, shininess);
-  }
-  vec3 color_linear = ambient_color +
-                     diffuse_color * lambertian * light_color * light_power / distance +
-                     specular_color * specular * light_color * light_power / distance;
+ 	//Halfway-Vector
+ 	vec3 H = normalize(L+V);
 
+	//Diffuse Effect (Lambertian BRDF)
+	//if Angle < 0, set to 0
+	float diffuseAngle = max(dot(L, N), 0.0f);
+	vec3 diffuse_effect = diffuse_color * diffuseAngle * (reflectivity / pi);
 
-  color_linear *= pass_Color;                     
-  out_Color = vec4(pow(color_linear, vec3(1.0/screen_gamma)), 1.0);
+	//Specular Effect (Blinn-Phong BRDF)
+	//if Angle < 0, set to 0 
+	float specularAngle = max(dot(H,V), 0.0f);
+	vec3 specular_effect = specular_color * pow(specularAngle, glossiness);
+
+	// All together
+	vec3 total_color = ambient_color + diffuse_effect + specular_effect;
+
+	out_Color = vec4(total_color.xyz, 1.0f);
+
 }

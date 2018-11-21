@@ -1,51 +1,54 @@
 #version 150
 #extension GL_ARB_explicit_attrib_location : require
+
 // vertex attributes of VAO
 layout(location = 0) in vec3 in_Position;
 layout(location = 1) in vec3 in_Normal;
 
-//Matrix Uniforms as specified with glUniformMatrix4fv
+// UNIFORMS
 uniform mat4 ModelMatrix;
 uniform mat4 ViewMatrix;
 uniform mat4 ProjectionMatrix;
-//uniform mat4 NormalMatrix;
+uniform mat4 NormalMatrix;
 uniform vec3 PlanetColor; // = diffuse and ambient color
 
+uniform vec3 LightPosition;
+uniform vec3 LightColor;
+uniform float LightIntensity;
 
-//in vec3 pass_Normal;
+// OUT
+out vec3 pass_Normal;
+out vec3 pass_VertexPosition; // is in camera-space?
 out vec3 pass_Color;
-
-out vec3 pass_vert_position;
-out vec3 pass_cam_direction;
+out vec3 pass_LightPosition;
+out vec3 pass_LightColor;
+out float pass_LightIntensity;
 
 void main(void)
 {
-	// const:
-	// vec3 SpecularColor = vec3(1,1,1);
-	// PI
-	// flaot Reflectivity
-	// float Alpha
-	
+	// Position of the Vertex that is rendered right now in clip space - is the output of the vertex shader
+	//(transformed from object to world to view space to clip space by Transformation Matrices)
 
-	//TODO
-	// ß Funktion für Lichtquelle
-	// Halfway Vector
-	// Cd
-	// Cs
-
-	//Wie simple.vert:
 	gl_Position = (ProjectionMatrix  * ViewMatrix * ModelMatrix) * vec4(in_Position, 1.0);
-	
+
+	// Vertex Position without projection, as homogenous coordinate
+
 	vec4 vertPos4 = (ViewMatrix * ModelMatrix) * vec4(in_Position, 1.0);
 
-	pass_vert_position = vec3(ViewMatrix * vec4(vec3(vertPos4) / vertPos4.w,0.0) ).xyz;
+	// Vertex Position converted from homogenous view coordinate (in view space) to ndc (normalized device coordinates in normalized device space)
+
+	pass_VertexPosition = vertPos4.xyz / vertPos4.w;
 	
-	pass_cam_direction= -vec3(ViewMatrix * vec4(in_Position, 0.0)).xyz;
+	// Normal
 
-	// Wie simple.vert:
-	//pass_Normal = (NormalMatrix * vec4(in_Normal, 0.0)).xyz;
+	pass_Normal = (NormalMatrix * vec4(in_Normal, 0.0)).xyz;
+	
+	// Colors and Lights
+	
 	pass_Color = PlanetColor;
+	pass_LightPosition = (ViewMatrix*vec4(LightPosition,1.0f)).xyz;
+	pass_LightColor = LightColor;
+	pass_LightIntensity = LightIntensity;
 }
-
 
 
