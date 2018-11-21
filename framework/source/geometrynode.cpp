@@ -48,3 +48,11 @@ void GeometryNode::setColor(glm::fvec3 t_color) {
 glm::fvec3 GeometryNode::getColor() const{
 	return m_color;
 }
+
+void GeometryNode::setSize(float t_size){
+	m_size = t_size;
+}
+
+float GeometryNode::getSize() const{
+	return m_size;
+}

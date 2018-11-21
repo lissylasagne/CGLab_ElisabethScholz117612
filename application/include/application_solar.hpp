@@ -65,6 +65,8 @@ class ApplicationSolar : public Application {
   model m_planet_model;
   model m_star_model;
 
+  std::string m_shading_mode;
+
 };
 
 #endif
