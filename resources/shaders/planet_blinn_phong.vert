@@ -8,14 +8,11 @@ layout(location = 1) in vec3 in_Normal;
 uniform mat4 ModelMatrix;
 uniform mat4 ViewMatrix;
 uniform mat4 ProjectionMatrix;
-uniform mat4 NormalMatrix;
+//uniform mat4 NormalMatrix;
 uniform vec3 PlanetColor; // = diffuse and ambient color
 
-uniform vec3 LightPosition;
-uniform vec3 LightColor;
-uniform float LightIntensity; //?
 
-out vec3 pass_Normal;
+//in vec3 pass_Normal;
 out vec3 pass_Color;
 
 out vec3 pass_vert_position;
@@ -46,7 +43,7 @@ void main(void)
 	pass_cam_direction= -vec3(ViewMatrix * vec4(in_Position, 0.0)).xyz;
 
 	// Wie simple.vert:
-	pass_Normal = (NormalMatrix * vec4(in_Normal, 0.0)).xyz;
+	//pass_Normal = (NormalMatrix * vec4(in_Normal, 0.0)).xyz;
 	pass_Color = PlanetColor;
 }
 

@@ -64,6 +64,7 @@ class ApplicationSolar : public Application {
   std::vector<float> m_stars;
   model m_planet_model;
   model m_star_model;
+  std::string m_shading_mode;
 
 };
 

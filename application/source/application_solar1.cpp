@@ -24,7 +24,7 @@ ApplicationSolar::ApplicationSolar(std::string const& resource_path)
  ,planet_object{}
  ,m_view_transform{glm::translate(glm::fmat4{}, glm::fvec3{0.0f, 0.0f, 30.0f})}
  ,m_view_projection{utils::calculate_projection_matrix(initial_aspect_ratio)}
- ,m_shading_mode{"planet_blinn_phong"}
+ ,m_shader{"planet_blinn_phong"}
 {
   // init for Planets - for some reason, only sun + one planet are rendered if
   // initPlanets() is dome before initGeometry() ???
@@ -62,8 +62,8 @@ void ApplicationSolar::uploadView() {
   // upload matrix to gpu
 
   //PLANETS
-  glUseProgram(m_shaders.at(m_shading_mode).handle);
-  glUniformMatrix4fv(m_shaders.at(m_shading_mode).u_locs.at("ViewMatrix"),
+  glUseProgram(m_shaders.at(m_shader).handle);
+  glUniformMatrix4fv(m_shaders.at(m_shader).u_locs.at("ViewMatrix"),
                      1, GL_FALSE, glm::value_ptr(view_matrix));
 
   //STARS
@@ -76,8 +76,8 @@ void ApplicationSolar::uploadProjection() {
   // upload matrix to gpu
 
   //PLANETS
-  glUseProgram(m_shaders.at(m_shading_mode).handle);
-  glUniformMatrix4fv(m_shaders.at(m_shading_mode).u_locs.at("ProjectionMatrix"),
+  glUseProgram(m_shaders.at("planet").handle);
+  glUniformMatrix4fv(m_shaders.at("planet").u_locs.at("ProjectionMatrix"),
                      1, GL_FALSE, glm::value_ptr(m_view_projection));
   //STARS
 	glUseProgram(m_shaders.at("stars").handle);
@@ -102,42 +102,28 @@ void ApplicationSolar::initializeShaderPrograms() {
   
   //PLANETS
 
-  //blinn phong
   // store shader program objects in container
   m_shaders.emplace("planet_blinn_phong", shader_program{{{GL_VERTEX_SHADER,m_resource_path + "shaders/planet_blinn_phong.vert"},
                                            {GL_FRAGMENT_SHADER, m_resource_path + "shaders/planet_blinn_phong.frag"}}});
-  // request uniform locations for shader program
-  
-  //simple shader uniforms
-  m_shaders.at("planet_blinn_phong").u_locs["NormalMatrix"] = -1;
-  m_shaders.at("planet_blinn_phong").u_locs["ModelMatrix"] = -1;
-  m_shaders.at("planet_blinn_phong").u_locs["ViewMatrix"] = -1; // = daraus camera position ableiten?
-  m_shaders.at("planet_blinn_phong").u_locs["ProjectionMatrix"] = -1;
-  m_shaders.at("planet_blinn_phong").u_locs["PlanetColor"] = -1; // = diffuse and ambient color
-
-  //planet shader specific uniforms
-  m_shaders.at("planet_blinn_phong").u_locs["LightPosition"] = -1;
-  m_shaders.at("planet_blinn_phong").u_locs["LightColor"] = -1;
-  m_shaders.at("planet_blinn_phong").u_locs["LightIntensity"] = -1;
-
-
-  //cell shading
-  // store shader program objects in container
   m_shaders.emplace("planet_cel_shading", shader_program{{{GL_VERTEX_SHADER,m_resource_path + "shaders/planet_cel_shading.vert"},
                                            {GL_FRAGMENT_SHADER, m_resource_path + "shaders/planet_cel_shading.frag"}}});
   // request uniform locations for shader program
   
   //simple shader uniforms
+  //m_shaders.at("planet_blinn_phong").u_locs["NormalMatrix"] = -1;
+  m_shaders.at("planet_blinn_phong").u_locs["ModelMatrix"] = -1;
+  m_shaders.at("planet_blinn_phong").u_locs["ViewMatrix"] = -1; // = daraus camera position ableiten?
+  m_shaders.at("planet_blinn_phong").u_locs["ProjectionMatrix"] = -1;
+  m_shaders.at("planet_blinn_phong").u_locs["PlanetColor"] = -1; // = diffuse and ambient color
+
+
   m_shaders.at("planet_cel_shading").u_locs["NormalMatrix"] = -1;
   m_shaders.at("planet_cel_shading").u_locs["ModelMatrix"] = -1;
   m_shaders.at("planet_cel_shading").u_locs["ViewMatrix"] = -1; // = daraus camera position ableiten?
   m_shaders.at("planet_cel_shading").u_locs["ProjectionMatrix"] = -1;
   m_shaders.at("planet_cel_shading").u_locs["PlanetColor"] = -1; // = diffuse and ambient color
 
-  //planet shader specific uniforms
-  m_shaders.at("planet_cel_shading").u_locs["LightPosition"] = -1;
-  m_shaders.at("planet_cel_shading").u_locs["LightColor"] = -1;
-  m_shaders.at("planet_cel_shading").u_locs["LightIntensity"] = -1;
+  
 
   //STARS
 
@@ -304,7 +290,7 @@ void ApplicationSolar::initializeStars(int numberStars) {
 
 //deal with traversing the SceneGraph
 void ApplicationSolar::renderPlanets() const{
-	glUseProgram(m_shaders.at(m_shading_mode).handle);
+	glUseProgram(m_shaders.at(m_shader).handle);
 
   GeometryNode* sun = dynamic_cast<GeometryNode*>(m_scene.getRoot()->getChildren("sun"));
   GeometryNode* planet1 = dynamic_cast<GeometryNode*>(sun->getChildren("planet1"));
@@ -338,16 +324,16 @@ void ApplicationSolar::renderPlanet(GeometryNode* planet) const {
     glm::fvec3{planet->getDistance(), 0.0f, 0.0f});
 
   // give model_matrix to shader
-  glUniformMatrix4fv(m_shaders.at(m_shading_mode).u_locs.at("ModelMatrix"),
+  glUniformMatrix4fv(m_shaders.at(m_shader).u_locs.at("ModelMatrix"),
                      1, GL_FALSE, glm::value_ptr(model_matrix));
 
   glm::fvec3 planetColor = planet->getColor();
-  glUniform3f(m_shaders.at(m_shading_mode).u_locs.at("PlanetColor"), planetColor.x, planetColor.y, planetColor.z);
+  glUniform3f(m_shaders.at(m_shader).u_locs.at("PlanetColor"), planetColor.x, planetColor.y, planetColor.z);
 
   // extra matrix for normal transformation to keep them orthogonal to surface
   glm::fmat4 normal_matrix = glm::inverseTranspose(glm::inverse(m_view_transform) * model_matrix);
   //give normal matrix to shader
-  glUniformMatrix4fv(m_shaders.at(m_shading_mode).u_locs.at("NormalMatrix"),
+  glUniformMatrix4fv(m_shaders.at(m_shader).u_locs.at("NormalMatrix"),
                      1, GL_FALSE, glm::value_ptr(normal_matrix));
 
   // bind the VAO to draw
@@ -395,12 +381,13 @@ void ApplicationSolar::keyCallback(int key, int action, int mods) {
   } //right; negative x direction
   
   else if(key == GLFW_KEY_1 && (action == GLFW_PRESS || action == GLFW_REPEAT)) {
-    m_shading_mode = "planet_blinn_phong";
+    m_shader = "planet_blinn_phong";
   }
-
+/*
   else if(key == GLFW_KEY_2 && (action == GLFW_PRESS || action == GLFW_REPEAT)) {
-    m_shading_mode = "planet_cel_shading";
+    m_shader = "planet_cel_shading";
   }
+ */
 }
 
 //handle delta mouse movement input

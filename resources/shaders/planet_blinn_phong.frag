@@ -1,6 +1,6 @@
 #version 150
 
-in vec3 pass_Normal;
+//in vec3 pass_Normal;
 in vec3 pass_Color;
 
 in vec3 pass_vert_position;
@@ -41,5 +41,6 @@ void main() {
                      specular_color * specular * light_color * light_power / distance;
 
 
+  color_linear *= pass_Color;                     
   out_Color = vec4(pow(color_linear, vec3(1.0/screen_gamma)), 1.0);
 }
