@@ -21,4 +21,3 @@ void main(void)
 	pass_Color = PlanetColor;
 }
 
-

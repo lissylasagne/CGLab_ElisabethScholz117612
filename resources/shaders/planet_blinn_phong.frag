@@ -44,4 +44,3 @@ void main() {
   color_linear *= pass_Color;                     
   out_Color = vec4(pow(color_linear, vec3(1.0/screen_gamma)), 1.0);
 }
-

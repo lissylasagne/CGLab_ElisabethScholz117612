@@ -8,4 +8,3 @@ void main() {
   out_Color = vec4(abs(normalize(pass_Color+pass_Normal)), 1.0);
 }
 
-
