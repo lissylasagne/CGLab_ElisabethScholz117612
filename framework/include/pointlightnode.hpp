@@ -23,7 +23,6 @@ class PointLightNode : public Node{
 	private:
 		float m_lightIntensity;
 		glm::fvec3 m_lightColor;
-
 };
 
 #endif

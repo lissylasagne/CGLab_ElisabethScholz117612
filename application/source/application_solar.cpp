@@ -22,7 +22,7 @@ using namespace gl;
 ApplicationSolar::ApplicationSolar(std::string const& resource_path)
  :Application{resource_path}
  ,planet_object{}
- ,m_view_transform{glm::translate(glm::fmat4{}, glm::fvec3{0.0f, 0.0f, 30.0f})}
+ ,m_view_transform{glm::translate(glm::fmat4{}, glm::fvec3{0.0f, 0.0f, 40.0f})}
  ,m_view_projection{utils::calculate_projection_matrix(initial_aspect_ratio)}
  ,m_shading_mode{"planet_blinn_phong"}
 {
@@ -102,42 +102,26 @@ void ApplicationSolar::initializeShaderPrograms() {
   
   //PLANETS
 
-  //blinn phong
+  //shader path
+  std::string fragShaderPath = "shaders/" + m_shading_mode + ".frag";
+  std::string vertShaderPath = "shaders/" + m_shading_mode + ".vert";
+
   // store shader program objects in container
-  m_shaders.emplace("planet_blinn_phong", shader_program{{{GL_VERTEX_SHADER,m_resource_path + "shaders/planet_blinn_phong.vert"},
-                                           {GL_FRAGMENT_SHADER, m_resource_path + "shaders/planet_blinn_phong.frag"}}});
+  m_shaders.emplace(m_shading_mode, shader_program{{{GL_VERTEX_SHADER,m_resource_path + vertShaderPath},
+                                           {GL_FRAGMENT_SHADER, m_resource_path + fragShaderPath}}});
   // request uniform locations for shader program
   
   //simple shader uniforms
-  m_shaders.at("planet_blinn_phong").u_locs["NormalMatrix"] = -1;
-  m_shaders.at("planet_blinn_phong").u_locs["ModelMatrix"] = -1;
-  m_shaders.at("planet_blinn_phong").u_locs["ViewMatrix"] = -1; // = daraus camera position ableiten?
-  m_shaders.at("planet_blinn_phong").u_locs["ProjectionMatrix"] = -1;
-  m_shaders.at("planet_blinn_phong").u_locs["PlanetColor"] = -1; // = diffuse and ambient color
+  m_shaders.at(m_shading_mode).u_locs["NormalMatrix"] = -1;
+  m_shaders.at(m_shading_mode).u_locs["ModelMatrix"] = -1;
+  m_shaders.at(m_shading_mode).u_locs["ViewMatrix"] = -1; // = daraus camera position ableiten?
+  m_shaders.at(m_shading_mode).u_locs["ProjectionMatrix"] = -1;
+  m_shaders.at(m_shading_mode).u_locs["PlanetColor"] = -1; // = diffuse and ambient color
 
   //planet shader specific uniforms
-  m_shaders.at("planet_blinn_phong").u_locs["LightPosition"] = -1;
-  m_shaders.at("planet_blinn_phong").u_locs["LightColor"] = -1;
-  m_shaders.at("planet_blinn_phong").u_locs["LightIntensity"] = -1;
-
-
-  //cell shading
-  // store shader program objects in container
-  m_shaders.emplace("planet_cel_shading", shader_program{{{GL_VERTEX_SHADER,m_resource_path + "shaders/planet_cel_shading.vert"},
-                                           {GL_FRAGMENT_SHADER, m_resource_path + "shaders/planet_cel_shading.frag"}}});
-  // request uniform locations for shader program
-  
-  //simple shader uniforms
-  m_shaders.at("planet_cel_shading").u_locs["NormalMatrix"] = -1;
-  m_shaders.at("planet_cel_shading").u_locs["ModelMatrix"] = -1;
-  m_shaders.at("planet_cel_shading").u_locs["ViewMatrix"] = -1; // = daraus camera position ableiten?
-  m_shaders.at("planet_cel_shading").u_locs["ProjectionMatrix"] = -1;
-  m_shaders.at("planet_cel_shading").u_locs["PlanetColor"] = -1; // = diffuse and ambient color
-
-  //planet shader specific uniforms
-  m_shaders.at("planet_cel_shading").u_locs["LightPosition"] = -1;
-  m_shaders.at("planet_cel_shading").u_locs["LightColor"] = -1;
-  m_shaders.at("planet_cel_shading").u_locs["LightIntensity"] = -1;
+  m_shaders.at(m_shading_mode).u_locs["LightPosition"] = -1;
+  m_shaders.at(m_shading_mode).u_locs["LightColor"] = -1;
+  m_shaders.at(m_shading_mode).u_locs["LightIntensity"] = -1;
 
   //STARS
 
@@ -238,53 +222,54 @@ void ApplicationSolar::initializeStarGeometry() {
 //iterate trough the SceneGraph and transform and render the Planets
 void ApplicationSolar::initializePlanets() {
   
-  glm::fmat4 unitmat{ 1.0f, 0.0f, 0.0f, 0.0f, 
-                      0.0f, 1.0f, 0.0f, 0.0f,
-                      0.0f, 0.0f, 1.0f, 0.0f, 
-                      0.0f, 0.0f, 0.0f, 1.0f};
+  // Colors
+  glm::fvec3 white    = glm::fvec3{1.0f,1.0f,1.0f};
+
+  glm::fvec3 green    = glm::fvec3{0.0f,0.6f,0.0f};
+  glm::fvec3 red      = glm::fvec3{0.6f,0.0f,0.0f};
+  glm::fvec3 blue     = glm::fvec3{0.0f,0.0f,0.6f};
+
+  glm::fvec3 yellow   = glm::fvec3{0.8f,0.8f,0.1f};
+
+  glm::fmat4 unitmat = glm::fmat4{1.0f};
+
   //create root
   Node* root = new Node("root");
   m_scene = SceneGraph("scene", root);
 
   //create structure of solar system in scenegraph
-  //GeometryNode sun{"sun", unitmat, unitmat, m_planet_model};
   GeometryNode* sun = new GeometryNode("sun", unitmat, unitmat, m_planet_model);
-
   root->addChildren(sun);
   sun->setDistance(0.0f);
   sun->setSpeed(1.0f);
-  sun->setColor(glm::fvec3{1.0f,1.0f,0.0f});
+  sun->setSize(10.0f);
+  sun->setColor(yellow); //yellow
 
   GeometryNode* planet1 = new GeometryNode("planet1", unitmat, unitmat, m_planet_model);
   sun->addChildren(planet1);
-  planet1->setLocalTransform(glm::fmat4{ 1.0f, 0.0f, 0.0f, 0.0f, 
-                                        0.0f, 1.0f, 0.0f, 0.0f,
-                                        0.0f, 0.0f, 1.0f, 0.0f, 
-                                        0.0f, 0.0f, 0.0f, 2.0});
-  planet1->setDistance(20.0f);
-  planet1->setSpeed(2.4f);
-  planet1->setColor(glm::fvec3{1.0f,0.0f,1.0f});
+  planet1->setDistance(15.0f);
+  planet1->setSpeed(1.4f);
+  planet1->setSize(2.0f);
+  planet1->setColor(green);
 
   GeometryNode* planet2 = new GeometryNode("planet2", unitmat, unitmat, m_planet_model);
   sun->addChildren(planet2);
-  planet2->setLocalTransform(glm::fmat4{ 1.0f, 0.0f, 0.0f, 0.0f, 
-                                        0.0f, 1.0f, 0.0f, 0.0f,
-                                        0.0f, 0.0f, 1.0f, 0.0f, 
-                                        0.0f, 0.0f, 0.0f, 2.5});
   planet2->setDistance(30.0f);
   planet2->setSpeed(0.5f);
-  planet2->setColor(glm::fvec3{1.0f,1.0f,1.0f});
-
+  planet2->setSize(5.0f);
+  planet2->setColor(red);
 
   GeometryNode* moon = new GeometryNode("moon", unitmat, unitmat, m_planet_model);
   planet2->addChildren(moon);
-  moon->setLocalTransform(glm::fmat4{ 1.0f, 0.0f, 0.0f, 0.0f, 
-                                        0.0f, 1.0f, 0.0f, 0.0f,
-                                        0.0f, 0.0f, 1.0f, 0.0f, 
-                                        0.0f, 0.0f, 0.0f, 5.0});
   moon->setDistance(5.0f);
-  moon->setSpeed(1.0f);
-  moon->setColor(glm::fvec3{1.0f,1.0f,0.0f});
+  moon->setSpeed(0.5f);
+  moon->setSize(1.0f);
+  moon->setColor(blue);
+
+  PointLightNode* sunlight = new PointLightNode("sunlight", unitmat, unitmat);
+  root->addChildren(sunlight);
+  sunlight->setIntensity(0.2f);
+  sunlight->setColor(white);
 }
 
 void ApplicationSolar::initializeStars(int numberStars) {
@@ -319,23 +304,27 @@ void ApplicationSolar::renderPlanets() const{
 //deal with gl
 void ApplicationSolar::renderPlanet(GeometryNode* planet) const {
   glm::fmat4 model_matrix = glm::fmat4{1.0};
-   
-   if(planet->getName() == "moon") { 
-    model_matrix = planet->getParent()->getLocalTransform();
-    model_matrix = glm::translate(
-      glm::rotate(
-        model_matrix, 
-        float(glfwGetTime())* dynamic_cast<GeometryNode*>(planet->getParent())->getSpeed(), 
-        glm::fvec3{0.0f, 1.0f, 0.0f}),
-      glm::fvec3{dynamic_cast<GeometryNode*>(planet->getParent())->getDistance(), 0.0f, 0.0f});
-  } else model_matrix = planet->getLocalTransform();
+  
+  model_matrix = glm::scale(model_matrix, glm::fvec3(planet->getSize()));
+  //TODO
+  //the moon specific transformation should be shifted to updating the world_transformation with the parents and local transformations
 
-  model_matrix = glm::translate(
-    glm::rotate(
-      model_matrix, 
-      float(glfwGetTime())*planet->getSpeed(), 
-      glm::fvec3{0.0f, 1.0f, 0.0f}),
-    glm::fvec3{planet->getDistance(), 0.0f, 0.0f});
+  // if the planet is a moon, then the transformations to the parent planets position need to happen first
+  if(planet->getName() == "moon") { 
+    GeometryNode* parentPlanet = dynamic_cast<GeometryNode*>(planet->getParent());
+    model_matrix = parentPlanet->getLocalTransform();
+    model_matrix = glm::rotate(model_matrix, float(glfwGetTime())* parentPlanet->getSpeed(), glm::fvec3{0.0f, 1.0f, 0.0f});
+    model_matrix = glm::translate(model_matrix,glm::fvec3{parentPlanet->getDistance(), 0.0f, 0.0f});
+  }
+  // if not a moon, use localTransform
+  else {
+    model_matrix = planet->getLocalTransform();
+  }
+
+  // FIRST scale THEN rotate and THEN translate!
+  //model_matrix = glm::scale(model_matrix, glm::fvec3(planet->getSize()));
+  model_matrix = glm::rotate(model_matrix, float(glfwGetTime())*planet->getSpeed(), glm::fvec3{0.0f, 1.0f, 0.0f});
+  model_matrix = glm::translate(model_matrix, glm::fvec3{planet->getDistance(), 0.0f, 0.0f});
 
   // give model_matrix to shader
   glUniformMatrix4fv(m_shaders.at(m_shading_mode).u_locs.at("ModelMatrix"),
@@ -349,6 +338,14 @@ void ApplicationSolar::renderPlanet(GeometryNode* planet) const {
   //give normal matrix to shader
   glUniformMatrix4fv(m_shaders.at(m_shading_mode).u_locs.at("NormalMatrix"),
                      1, GL_FALSE, glm::value_ptr(normal_matrix));
+
+  //give sunlight data to shader
+
+  PointLightNode* sunlightNode = dynamic_cast<PointLightNode*>(m_scene.getRoot()->getChildren("sunlight"));
+  glm::fvec3 lightColor = sunlightNode->getColor();
+  glUniform3f(m_shaders.at(m_shading_mode).u_locs.at("LightPosition"), 0.0f, 0.0f, 0.0f);
+  glUniform1f(m_shaders.at(m_shading_mode).u_locs.at("LightIntensity"), sunlightNode->getIntensity());
+  glUniform3f(m_shaders.at(m_shading_mode).u_locs.at("LightColor"), lightColor.x, lightColor.y, lightColor.z);
 
   // bind the VAO to draw
   glBindVertexArray(planet_object.vertex_AO);

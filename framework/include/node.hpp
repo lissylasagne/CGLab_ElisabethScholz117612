@@ -37,7 +37,6 @@ class Node {
 		glm::mat4 m_localTransform;
 		glm::mat4 m_worldTransform;
 
-
 };
 
 #endif
