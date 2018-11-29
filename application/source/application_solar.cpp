@@ -4,6 +4,7 @@
 #include "utils.hpp"
 #include "shader_loader.hpp"
 #include "model_loader.hpp"
+#include "texture_loader.hpp"
 
 #include <glbinding/gl/gl.h>
 // use gl definitions from glbinding 
@@ -38,6 +39,9 @@ ApplicationSolar::ApplicationSolar(std::string const& resource_path)
 
   //init shaders
   initializeShaderPrograms();
+
+  //init textures
+  initializeTextures();
 }
 
 ApplicationSolar::~ApplicationSolar() {
@@ -111,6 +115,7 @@ void ApplicationSolar::initializeShaderPrograms() {
   m_shaders.at("planet").u_locs["ViewMatrix"] = -1; // = daraus camera position ableiten?
   m_shaders.at("planet").u_locs["ProjectionMatrix"] = -1;
   m_shaders.at("planet").u_locs["PlanetColor"] = -1; // = diffuse and ambient color
+  m_shaders.at("planet").u_locs["NormalTexture"] = -1;
 
   //planet shader specific uniforms
   m_shaders.at("planet").u_locs["LightPosition"] = -1;
@@ -282,6 +287,58 @@ void ApplicationSolar::initializeStars(int numberStars) {
   }
 }
 
+void ApplicationSolar::initializeTextures() {
+  //std::string texture_path = m_resource_path + "textures/katze1.png";
+  pixel_data data = texture_loader::file(m_resource_path + "textures/katze1.png"); 
+/*
+  glActiveTexture(GL_TEXTURE*);
+  glGenTexture(tex_num, &texture_object);
+  glBindTexture(target, texture_object);
+
+  glTexParametri(target, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+  glTexParametri(target, GL_TEXTURE_MAX_FILTER, GL_LINEAR);
+
+  glTexImage2D(target, level, internalformat, width, height, border, format, type, data);
+
+  glActiveTexture(GL_TEXTURE k);
+  glBindTexture(target, texture_object);
+  
+  int sampler_location = glGetUniformLocation(program_handle, ‘‘YourTexture’’);
+  glUseProgram(program_handle);
+  glUniform1i(sampler_location, k);
+
+  uniform Sampler2D YourTexture;
+  vec4 colour_from_tex = texture*(YourTexture, tex_coords);
+  
+*/
+
+  texture_object t0;
+  glActiveTexture(GL_TEXTURE0);
+  glGenTextures(1, &t0.handle);
+  glBindTexture(GL_TEXTURE_2D, t0.handle);
+  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+
+  glTexImage2D(GL_TEXTURE_2D, 0, data.channels, data.width, data.height, 0, data.channels, data.channel_type, data.ptr());
+/*
+  std::string path_normals = m_resource_path + "normal_textures/" + std::to_string(i) + ".png";
+  pixel_data pix_dat_normal = texture_loader::file(path_normals); 
+
+  glActiveTexture(GL_TEXTURE1);
+  glGenTextures(1, &normal_texture[i].handle);
+  glBindTexture(GL_TEXTURE_2D, normal_texture[i].handle);
+  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+
+  glTexImage2D(GL_TEXTURE_2D, 0, pix_dat_normal.channels, pix_dat_normal.width, pix_dat_normal.height, 0, pix_dat_normal.channels, pix_dat_normal.channel_type, pix_dat_normal.ptr());
+*/
+}
+
+
 ///////////////////////////// rendering functions /////////////////////////
 
 //deal with traversing the SceneGraph
@@ -330,7 +387,18 @@ void ApplicationSolar::renderPlanet(GeometryNode* planet) const {
 
   glm::fvec3 planetColor = planet->getColor();
   glUniform3f(m_shaders.at("planet").u_locs.at("PlanetColor"), planetColor.x, planetColor.y, planetColor.z);
+/*
+  //planet textures
+  //was noch gemacht werden muss: eine funktion die einen vector planet_handle anlegt, in dem texture_objects sind, die dann auch in initializeTextures genutz werden
+  glActiveTexture(GL_TEXTURE0);
+  glBindTexture(GL_TEXTURE_2D, planet_texture[?].handle); //? = anzahl der planeten 
+  int color_sampler_location = glGetUniformLocation(m_shaders.at("planet").handle, "ColorTex");
+  glUniform1i(color_sampler_location, 0);
 
+  glActiveTexture(GL_TEXTURE1);
+  glBindTexture(GL_TEXTURE_2D, normal_texture[10].handle);
+  glUniform1i(glGetUniformLocation(m_shaders.at("planet").handle, "NormalTexture"), 1);
+*/
   // extra matrix for normal transformation to keep them orthogonal to surface
   glm::fmat4 normal_matrix = glm::inverseTranspose(glm::inverse(m_view_transform) * model_matrix);
   //give normal matrix to shader
@@ -371,11 +439,11 @@ void ApplicationSolar::renderStars() const {
 
 // handle key input
 void ApplicationSolar::keyCallback(int key, int action, int mods) {
-  if (key == GLFW_KEY_X  && (action == GLFW_PRESS || action == GLFW_REPEAT)) {
+  if (key == GLFW_KEY_R  && (action == GLFW_PRESS || action == GLFW_REPEAT)) {
     m_view_transform = glm::translate(m_view_transform, glm::fvec3{0.0f, 0.0f, -0.1f});
     uploadView();
   } //closer; negative z direction
-  else if (key == GLFW_KEY_C  && (action == GLFW_PRESS || action == GLFW_REPEAT)) {
+  else if (key == GLFW_KEY_E  && (action == GLFW_PRESS || action == GLFW_REPEAT)) {
     m_view_transform = glm::translate(m_view_transform, glm::fvec3{0.0f, 0.0f, 0.1f});
     uploadView();
   } //further; positive z direction
@@ -412,7 +480,18 @@ void ApplicationSolar::keyCallback(int key, int action, int mods) {
 //handle delta mouse movement input
 void ApplicationSolar::mouseCallback(double pos_x, double pos_y) {
   // mouse handling
-  m_view_transform = glm::translate(m_view_transform, glm::fvec3{-(pos_x/100), pos_y/100, 0.0f});
+   if (pos_x > 0){
+        m_view_transform = glm::rotate(m_view_transform, 0.005f,glm::fvec3{0.0f, 1.0f, 0.0f});
+    }
+    else if(pos_x < 0){
+        m_view_transform = glm::rotate(m_view_transform, -0.005f,glm::fvec3{0.0f, 1.0f, 0.0f});
+    }
+    if(pos_y > 0){
+        m_view_transform = glm::rotate(m_view_transform, 0.005f,glm::fvec3{1.0f, 0.0f, 0.0f});
+    } 
+    else if(pos_y < 0){
+        m_view_transform = glm::rotate(m_view_transform, -0.005f,glm::fvec3{1.0f, 0.0f, 0.0f});
+}
   uploadView();
 }
 

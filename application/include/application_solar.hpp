@@ -31,6 +31,7 @@ class ApplicationSolar : public Application {
   void initializeStarGeometry();
   void initializePlanets();
   void initializeStars(int numberStars);
+  void initializeTextures();
 
   // update uniform values
   void uploadUniforms();

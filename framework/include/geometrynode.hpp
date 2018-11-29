@@ -4,6 +4,7 @@
 #include <glbinding/gl/types.h>
 #include "node.hpp"
 #include "model.hpp"
+#include "pixel_data.hpp"
 
 // use gl definitions from glbinding 
 using namespace gl;
@@ -37,6 +38,7 @@ class GeometryNode : public Node{
 		float m_speed;
 		glm::fvec3 m_color;
 		float m_size;
+		pixel_data m_normalmap;
 };
 
 #endif
