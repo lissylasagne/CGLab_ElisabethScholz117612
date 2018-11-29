@@ -56,3 +56,12 @@ void GeometryNode::setSize(float t_size){
 float GeometryNode::getSize() const{
 	return m_size;
 }
+
+
+void setTexture(std::string const& file_name){
+	m_texture = texture_loader::file(std::string const& file_name) 
+}
+
+pixel_data getTexture() const{
+	return m_texture;
+}

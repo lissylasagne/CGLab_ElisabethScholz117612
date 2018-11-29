@@ -19,14 +19,14 @@ void main() {
 	float pi = 3.1415926;
 	
 	// Parameters
-	vec3 ambient_color = pass_Color.xyz * 0.4;
+	vec3 ambient_color = pass_Color.xyz * 0.01;
 	vec3 diffuse_color = pass_Color;
-	vec3 specular_color = pass_LightColor;
+	vec3 specular_color = pass_Color * 1.2;//pass_LightColor;
 
 	//rho
-	float reflectivity = 0.5;
+	float reflectivity = 1.0;
 	//4*alpha
-	float glossiness = 64;
+	float glossiness = 16;
 
 	// Vectors
 	// Normal on Surface Vector
@@ -51,8 +51,10 @@ void main() {
 	float specularAngle = max(dot(H,V), 0.0f);
 	vec3 specular_effect = specular_color * pow(specularAngle, glossiness);
 
+	vec3 beta = pass_LightIntensity * pass_LightColor / 4*pi * pow(length(pass_VertexPosition - pass_LightPosition), 2);
+
 	// All together
-	vec3 total_color = ambient_color + diffuse_effect + specular_effect * pass_LightIntensity;
+	vec3 total_color = ambient_color + (diffuse_effect + specular_effect) * beta;
 
 	vec3 homogColor = vec3(0.0f, 0.0f, 0.0f);
 
@@ -82,6 +84,7 @@ void main() {
 	else{ homogColor = total_color; }
 
 	// Gamma-Correction (with Screen-Gamma 2.2)
-	out_Color = vec4(pow(homogColor, vec3(1.0/2.2)), 1.0);
+	out_Color = vec4(homogColor, 1.0);
+	;//vec4(pow(homogColor, vec3(1.0/2.2)), 1.0);
 }
 

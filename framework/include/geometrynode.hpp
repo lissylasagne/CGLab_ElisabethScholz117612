@@ -23,14 +23,21 @@ class GeometryNode : public Node{
 
 		model getGeometry();
 		void setGeometry(model t_geometry);
+		
 		void setDistance(float t_distance);
 		float getDistance() const;
+		
 		void setSpeed(float t_speed);
 		float getSpeed() const;
+		
 		void setColor(glm::fvec3 t_color);
 		glm::fvec3 getColor() const;
+		
 		void setSize(float t_size);
 		float getSize() const;
+
+		void setTexture(std::string const& file_name);
+		pixel_data getTexture() const;
 
 	private:
 		model m_geometry;
@@ -38,6 +45,7 @@ class GeometryNode : public Node{
 		float m_speed;
 		glm::fvec3 m_color;
 		float m_size;
+
 		pixel_data m_normalmap;
 };
 
