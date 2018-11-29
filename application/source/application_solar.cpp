@@ -241,31 +241,35 @@ void ApplicationSolar::initializePlanets() {
   sun->setSpeed(1.0f);
   sun->setSize(4.0f);
   sun->setColor(yellow); //yellow
+  sun->setTexture(m_resource_path + "textures/sun.jpg");
 
-  GeometryNode* planet1 = new GeometryNode("planet1", unitmat, unitmat, m_planet_model);
-  sun->addChildren(planet1);
-  planet1->setDistance(15.0f);
-  planet1->setSpeed(1.4f);
-  planet1->setSize(2.0f);
-  planet1->setColor(green);
+  GeometryNode* mercury = new GeometryNode("mercury", unitmat, unitmat, m_planet_model);
+  sun->addChildren(mercury);
+  mercury->setDistance(15.0f);
+  mercury->setSpeed(1.4f);
+  mercury->setSize(2.0f);
+  mercury->setColor(green);
+  sun->setTexture(m_resource_path + "textures/mercury.jpg");
 
-  GeometryNode* planet2 = new GeometryNode("planet2", unitmat, unitmat, m_planet_model);
-  sun->addChildren(planet2);
-  planet2->setDistance(30.0f);
-  planet2->setSpeed(0.5f);
-  planet2->setSize(5.0f);
-  planet2->setColor(red);
+  GeometryNode* earth = new GeometryNode("earth", unitmat, unitmat, m_planet_model);
+  sun->addChildren(earth);
+  earth->setDistance(30.0f);
+  earth->setSpeed(0.5f);
+  earth->setSize(5.0f);
+  earth->setColor(red);
+  sun->setTexture(m_resource_path + "textures/earth.jpg");
 
   GeometryNode* moon = new GeometryNode("moon", unitmat, unitmat, m_planet_model);
-  planet2->addChildren(moon);
+  earth->addChildren(moon);
   moon->setDistance(5.0f);
   moon->setSpeed(0.5f);
   moon->setSize(1.0f);
   moon->setColor(blue);
+  sun->setTexture(m_resource_path + "textures/moon.jpg");
 
   PointLightNode* sunlight = new PointLightNode("sunlight", unitmat, unitmat);
   root->addChildren(sunlight);
-  sunlight->setIntensity(0.6f);
+  sunlight->setIntensity(1.0f);
   sunlight->setColor(white);
 }
 
@@ -289,12 +293,12 @@ void ApplicationSolar::renderPlanets() const{
 	glUseProgram(m_shaders.at("planet").handle);
 
   GeometryNode* sun = dynamic_cast<GeometryNode*>(m_scene.getRoot()->getChildren("sun"));
-  GeometryNode* planet1 = dynamic_cast<GeometryNode*>(sun->getChildren("planet1"));
-  GeometryNode* planet2 = dynamic_cast<GeometryNode*>(sun->getChildren("planet2"));
-  GeometryNode* moon = dynamic_cast<GeometryNode*>(planet2->getChildren("moon"));
+  GeometryNode* mercury = dynamic_cast<GeometryNode*>(sun->getChildren("mercury"));
+  GeometryNode* earth = dynamic_cast<GeometryNode*>(sun->getChildren("earth"));
+  GeometryNode* moon = dynamic_cast<GeometryNode*>(earth->getChildren("moon"));
   renderPlanet(sun);
-  renderPlanet(planet1);
-  renderPlanet(planet2);
+  renderPlanet(m_planet_model);
+  renderPlanet(earth);
   renderPlanet(moon);
 }
 
