@@ -5,6 +5,7 @@
 #include "node.hpp"
 #include "model.hpp"
 #include "pixel_data.hpp"
+#include "structs.hpp"
 
 // use gl definitions from glbinding 
 using namespace gl;
@@ -22,7 +23,7 @@ class GeometryNode : public Node{
 			float distance,
 			float speed,
 			float size,
-			glm::fvec3 color,
+			glm::fvec3 color
 			);
 
 		//TODO: ctor implementieren und im ctor die texturen laden und initialisieren (setTexture ist schon fertig)
@@ -57,8 +58,6 @@ class GeometryNode : public Node{
 
 		pixel_data m_texture;
 		texture_object m_textureObject;
-
-		//pixel_data m_normalmap;
 };
 
 #endif
