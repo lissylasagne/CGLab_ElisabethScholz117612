@@ -126,7 +126,7 @@ void ApplicationSolar::initializeShaderPrograms() {
   m_shaders.at("planet").u_locs["LightIntensity"] = -1;
 
   //Texture Uniforms
-  m_shaders.at("planet").u_locs["YourTexture"] = -1;
+  m_shaders.at("planet").u_locs["PlanetTexture"] = -1;
   //m_shaders.at("planet").u_locs["YourNormalMap"] = -1;
 
   //ShaderMode uniform
@@ -247,48 +247,37 @@ void ApplicationSolar::initializePlanets() {
   //distance, speed, size, color
 
   GeometryNode* sun = new GeometryNode("sun", unitmat, unitmat, 
-  	0.0f, 1.0f, 2.0f, yellow);
-  sun->setTexture(m_resource_path + "textures/sun.jpg");
+  	0.0f, 1.0f, 2.0f, yellow, m_resource_path + "textures/sun.jpg");
 
   GeometryNode* mercury = new GeometryNode("mercury", unitmat, unitmat,
-  	10.0f, 1.4f, 1.0f, green);
-  sun->setTexture(m_resource_path + "textures/mercury.jpg");
+  	10.0f, 1.4f, 1.0f, green, m_resource_path + "textures/mercury.jpg");
 
   GeometryNode* mercury = new GeometryNode("venus", unitmat, unitmat,
-  	15.0f, 0.9f, 1.0f, green);
-    sun->setTexture(m_resource_path + "textures/venus.jpg");
+  	15.0f, 0.9f, 1.0f, green, m_resource_path + "textures/venus.jpg");
 
   GeometryNode* earth = new GeometryNode("earth", unitmat, unitmat,
-  	20.0f, 0.5f, 1.0f, red);
-  sun->setTexture(m_resource_path + "textures/earth.jpg");
+  	20.0f, 0.5f, 1.0f, red, m_resource_path + "textures/earth.jpg");
 
   GeometryNode* moon = new GeometryNode("moon", unitmat, unitmat,
-  	2.5f, 1.2f, 1.0f, blue);
-  sun->setTexture(m_resource_path + "textures/moon.jpg");
+  	2.5f, 1.2f, 1.0f, blue, m_resource_path + "textures/moon.jpg");
 
   GeometryNode* mars = new GeometryNode("mars", unitmat, unitmat,
-  	25.0f, 1.3f, 1.0f, red);
-  sun->setTexture(m_resource_path + "textures/mars.jpg");
+  	25.0f, 1.3f, 1.0f, red, m_resource_path + "textures/mars.jpg");
 
   GeometryNode* jupiter = new GeometryNode("jupiter", unitmat, unitmat,
-  	30.0f, 0.4f, 1.0f, red);
-  sun->setTexture(m_resource_path + "textures/jupiter.jpg");
+  	30.0f, 0.4f, 1.0f, red, m_resource_path + "textures/jupiter.jpg");
 
   GeometryNode* saturn = new GeometryNode("saturn", unitmat, unitmat,
-  	35.0f, 0.8f, 1.0f, red);
-  sun->setTexture(m_resource_path + "textures/saturn.jpg");
+  	35.0f, 0.8f, 1.0f, red, m_resource_path + "textures/saturn.jpg");
 
   GeometryNode* uranus = new GeometryNode("uranus", unitmat, unitmat,
-  	40.0f, 1.7f, 1.0f, red);
-  sun->setTexture(m_resource_path + "textures/uranus.jpg");
+  	40.0f, 1.7f, 1.0f, red, m_resource_path + "textures/uranus.jpg");
 
   GeometryNode* neptune = new GeometryNode("neptune", unitmat, unitmat,
-  	45.0f, 1.4f, 1.0f, red);
-  sun->setTexture(m_resource_path + "textures/neptune.jpg");
+  	45.0f, 1.4f, 1.0f, red, m_resource_path + "textures/neptune.jpg");
 
   GeometryNode* pluto = new GeometryNode("pluto", unitmat, unitmat,
-  	50.0f, 1.9f, 1.0f, red);
-  sun->setTexture(m_resource_path + "textures/pluto.jpg");
+  	50.0f, 1.9f, 1.0f, red, m_resource_path + "textures/pluto.jpg");
 
 
   PointLightNode* sunlight = new PointLightNode("sunlight", unitmat, unitmat);
@@ -328,9 +317,7 @@ void ApplicationSolar::initializeStars(int numberStars) {
 
 void ApplicationSolar::initializeTextures() {
 
-	// TODO: im GeometryNode Konstruktor direkt machen
-	// Skybox Texturen hier ?? initialisieren
-
+/*
 	pixel_data texture_data = planet.getTexture();
   texture_object texture_obj;
 
@@ -346,7 +333,7 @@ void ApplicationSolar::initializeTextures() {
 
   //Define Texture Data and Format
   //glTexImage2D(target, level, internalformat, width, height, border, format, type, data)
-  glTexImage2D(GL_TEXTURE_2D, 0, data.channels, data.width, data.height, 0, data.channels, data.channel_type, data.ptr());
+  glTexImage2D(GL_TEXTURE_2D, 0, texture_data.channels, texture_data.width, texture_data.height, 0, texture_data.channels, texture_data.channel_type, texture_data.ptr());
 
   std::string path_normals = m_resource_path + "normal_textures/" + std::to_string(i) + ".png";
   pixel_data pix_dat_normal = texture_loader::file(path_normals); 
@@ -358,8 +345,8 @@ void ApplicationSolar::initializeTextures() {
   glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
   glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
   glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
-
   glTexImage2D(GL_TEXTURE_2D, 0, pix_dat_normal.channels, pix_dat_normal.width, pix_dat_normal.height, 0, pix_dat_normal.channels, pix_dat_normal.channel_type, pix_dat_normal.ptr());
+*/
 }
 
 
@@ -396,6 +383,56 @@ void ApplicationSolar::renderPlanets() const{
 
 //deal with gl
 void ApplicationSolar::renderPlanet(GeometryNode* planet) const {
+  
+  // **** Upload data to shader *****
+
+  // MODEL MATRIX DATA
+  glm::fmat4 model_matrix = makeModelMatrix(planet);
+  glUniformMatrix4fv(m_shaders.at("planet").u_locs.at("ModelMatrix"),
+                     1, GL_FALSE, glm::value_ptr(model_matrix));
+
+  // PLANET COLOR DATA
+  glm::fvec3 planetColor = planet->getColor();
+  glUniform3f(m_shaders.at("planet").u_locs.at("PlanetColor"), planetColor.x, planetColor.y, planetColor.z);
+
+  // NORMAL MATRIX DATA (extra matrix for normal transformation to keep them orthogonal to surface)
+  glm::fmat4 normal_matrix = glm::inverseTranspose(glm::inverse(m_view_transform) * model_matrix);
+  glUniformMatrix4fv(m_shaders.at("planet").u_locs.at("NormalMatrix"),
+                     1, GL_FALSE, glm::value_ptr(normal_matrix));
+
+  //SUNLIGHT DATA
+  PointLightNode* sunlightNode = dynamic_cast<PointLightNode*>(m_scene.getRoot()->getChildren("sunlight"));
+  glm::fvec3 lightColor = sunlightNode->getColor();
+  glUniform3f(m_shaders.at("planet").u_locs.at("LightPosition"), 0.0f, 0.0f, 0.0f);
+  glUniform1f(m_shaders.at("planet").u_locs.at("LightIntensity"), sunlightNode->getIntensity());
+  glUniform3f(m_shaders.at("planet").u_locs.at("LightColor"), lightColor.x, lightColor.y, lightColor.z);
+
+	// TEXTURES
+  // GL_TEXTURE0 - color texture
+  // GL_TEXTURE1 - normal map
+
+  glActiveTexture(GL_TEXTURE0)
+  glBindTexture(GL_TEXTURE_2D, planet->getTextureObject().handle);
+  glUniform1i(m_shaders.at("planet").u_locs.at("PlanetTexture"), 0);
+
+	/*
+  glActiveTexture(GL_TEXTURE1);
+  glBindTexture(GL_TEXTURE_2D, planet->getNormalTextureObject().handle);
+  glUniform1i(glGetUniformLocation(m_shaders.at("planet").handle, "NormalTexture"), 1);
+	*/
+
+  // SHADERMODE
+  if(m_shading_mode == "blinn_phong"){
+    glUniform1i(m_shaders.at("planet").u_locs.at("ShaderMode"), 1); 
+  } else glUniform1i(m_shaders.at("planet").u_locs.at("ShaderMode"), 2);
+
+  // VAO
+  glBindVertexArray(planet_object.vertex_AO);
+  glDrawElements(planet_object.draw_mode, planet_object.num_elements, model::INDEX.type, NULL);
+}
+
+glm::fmat4 ApplicationSolar::makeModelMatrix(GeometryNode* planet) const{
+
   glm::fmat4 model_matrix = glm::fmat4{1.0};
   //model_matrix = glm::scale(model_matrix, glm::fvec3(planet->getSize()));
 
@@ -416,76 +453,7 @@ void ApplicationSolar::renderPlanet(GeometryNode* planet) const {
   model_matrix = glm::rotate(model_matrix, float(glfwGetTime())*planet->getSpeed(), glm::fvec3{0.0f, 1.0f, 0.0f});
   model_matrix = glm::translate(model_matrix, glm::fvec3{planet->getDistance(), 0.0f, 0.0f});
 
-  // Give data to shader
-  glUniformMatrix4fv(m_shaders.at("planet").u_locs.at("ModelMatrix"),
-                     1, GL_FALSE, glm::value_ptr(model_matrix));
-
-  glm::fvec3 planetColor = planet->getColor();
-  glUniform3f(m_shaders.at("planet").u_locs.at("PlanetColor"), planetColor.x, planetColor.y, planetColor.z);
-
-  // extra matrix for normal transformation to keep them orthogonal to surface
-  glm::fmat4 normal_matrix = glm::inverseTranspose(glm::inverse(m_view_transform) * model_matrix);
-  //give normal matrix to shader
-  glUniformMatrix4fv(m_shaders.at("planet").u_locs.at("NormalMatrix"),
-                     1, GL_FALSE, glm::value_ptr(normal_matrix));
-
-  //give sunlight data to shader
-  PointLightNode* sunlightNode = dynamic_cast<PointLightNode*>(m_scene.getRoot()->getChildren("sunlight"));
-  glm::fvec3 lightColor = sunlightNode->getColor();
-  glUniform3f(m_shaders.at("planet").u_locs.at("LightPosition"), 0.0f, 0.0f, 0.0f);
-  glUniform1f(m_shaders.at("planet").u_locs.at("LightIntensity"), sunlightNode->getIntensity());
-  glUniform3f(m_shaders.at("planet").u_locs.at("LightColor"), lightColor.x, lightColor.y, lightColor.z);
-
-
-
-  // TEXTUREN
-
-  //TODO hier aufräumen
- 
-  glActiveTexture(GL_TEXTURE*);
-  glBindTexture(GL_TEXTURE_2D, planet_texture[?].handle); //? = anzahl der planeten 
-  int color_sampler_location = glGetUniformLocation(m_shaders.at("planet").handle, "ColorTex");
-  glUniform1i(color_sampler_location, 0);
-
-  glActiveTexture(GL_TEXTURE1);
-  glBindTexture(GL_TEXTURE_2D, normal_texture[10].handle);
-  glUniform1i(glGetUniformLocation(m_shaders.at("planet").handle, "NormalTexture"), 1);
-
-  //Bind Texture for Accessing
-  glActiveTexture(GL_TEXTURE0);
-  //glBindTexture(target, texture_object)
-  //target ist enum Art der Textur,
-  //texture_object ist ein GLuint, der den Texturnamen spezifiziert
-  glBindTexture(GL_TEXTURE_2D, planet->getTextureObject().handle);
-
-  // Upload Texture Unit Data to Shader
-  //int sampler_location = glGetUniformLocation(m_shaders.at("planet").handle,"YourTexture");
-	//glUniform1i(sampler_location, 0);
-
-  glUniform1i(m_shaders.at("planet").u_locs.at("PlanetTexture"), 0);
-
-	//Same for NormalMap
-  glActiveTexture(GL_TEXTURE1);
-  glBindTexture(GL_TEXTURE_2D, planet_texture[?].handle);
-  int sampler_location = glGetUniformLocation(m_shaders.at("planet").handle,"YourNormalMap");
-	glUniform1i(sampler_location, 1);
-
-
-
-  //give shadermode to shader
-  if(m_shading_mode == "blinn_phong"){
-    glUniform1i(m_shaders.at("planet").u_locs.at("ShaderMode"), 1); 
-  }
-  else{
-    glUniform1i(m_shaders.at("planet").u_locs.at("ShaderMode"), 2);
-  }
-
-  // bind the VAO to draw
-  glBindVertexArray(planet_object.vertex_AO);
-
-  // draw bound vertex array using bound shader
-  glDrawElements(planet_object.draw_mode, planet_object.num_elements, model::INDEX.type, NULL);
-  
+  return model_matrix;
 }
 
 void ApplicationSolar::renderStars() const {

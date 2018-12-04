@@ -45,6 +45,8 @@ class ApplicationSolar : public Application {
   void renderPlanet(GeometryNode* planet) const;
   void renderStars() const;
 
+  glm::fmat4 makeModelMatrix(GeometryNode* planet) const;
+
   //misc
   SceneGraph* getSceneGraph() const;
 

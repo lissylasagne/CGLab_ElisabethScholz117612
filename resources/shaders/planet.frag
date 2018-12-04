@@ -1,13 +1,15 @@
 #version 150
 
 //IN
-in vec3 pass_Normal;
+//in vec3 pass_Normal;
 in vec3 pass_VertexPosition;
 in vec3 pass_Color;
 
 in vec3 pass_LightPosition;
 in vec3 pass_LightColor;
 in float pass_LightIntensity;
+
+in vec4 pass_TextureColor;
 
 flat in int pass_ShaderMode;
 
@@ -19,9 +21,16 @@ void main() {
 	float pi = 3.1415926;
 	
 	// Parameters
-	vec3 ambient_color = pass_Color.xyz * 0.01;
-	vec3 diffuse_color = pass_Color;
-	vec3 specular_color = pass_Color * 1.2;//pass_LightColor;
+
+	// using PlanetColor
+	//vec3 ambient_color = pass_Color.xyz * 0.01;
+	//vec3 diffuse_color = pass_Color;
+	//vec3 specular_color = pass_Color * 1.2;//pass_LightColor;
+	
+	// using TextureColor
+	vec3 ambient_color = pass_TextureColor.xyz * 0.01;
+	vec3 diffuse_color = pass_TextureColor;
+	vec3 specular_color = pass_TextureColor * 1.2;//pass_LightColor;
 
 	//rho
 	float reflectivity = 1.0;
