@@ -82,5 +82,5 @@ void GeometryNode::initTexture(){
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 	
 	glTexImage2D(GL_TEXTURE_2D, 0, m_texture.channels, m_texture.width, m_texture.height, 
-			0, m_texture.channels, m_textures.channel_type, *m_texture);
+			0, m_texture.channels, m_texture.channel_type, *m_texture);
 }
