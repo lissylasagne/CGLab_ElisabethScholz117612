@@ -11,7 +11,7 @@ in float pass_LightIntensity;
 
 in vec2 pass_TexCoords;
 
-uniform Sampler2D PlanetTexture;
+uniform sampler2D pass_PlanetTexture;
 
 flat in int pass_ShaderMode;
 
@@ -20,7 +20,7 @@ out vec4 out_Color;
 
 void main() {
 
-	vec3 textureColor = texture(pass_PlanetTexture, pass_TexCoords);
+	vec3 textureColor = texture(pass_PlanetTexture, pass_TexCoords).xyz;
 
 	// Const
 	float pi = 3.1415926;
@@ -33,7 +33,7 @@ void main() {
 	//vec3 specular_color = pass_Color * 1.2;//pass_LightColor;
 	
 	// using TextureColor
-	vec3 ambient_color = textureColor.xyz * 0.01;
+	vec3 ambient_color = textureColor.xyz * 0.01 + pass_Color * 0.001;
 	vec3 diffuse_color = textureColor;
 	vec3 specular_color = textureColor * 1.2;//pass_LightColor;
 
@@ -95,7 +95,8 @@ void main() {
 	}
 
 	// NORMALES SHADING
-	else{ homogColor = total_color; }
+	else{ homogColor = total_color;
+	}
 
 	// Gamma-Correction (with Screen-Gamma 2.2)
 	out_Color = vec4(homogColor, 1.0);

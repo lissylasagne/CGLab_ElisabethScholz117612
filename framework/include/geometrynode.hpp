@@ -44,13 +44,17 @@ class GeometryNode : public Node{
 		void setTexture(std::string const& file_name);
 		pixel_data getTexture() const;
 
-		void initTexture();
 
 		texture_object getTextureObject() const;
+
+		void initTexture();
 
 		/*
 		void setNormalMap(std::string const& file_name);
 		pixel_data getNormalMap() const;
+
+		void setNormalMapObject(texture_object t_texture);
+		texture_object getNormalMapObject() const;
 		*/
 
 	private:
