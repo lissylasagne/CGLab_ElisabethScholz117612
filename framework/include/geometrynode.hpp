@@ -5,6 +5,8 @@
 #include "node.hpp"
 #include "model.hpp"
 #include "pixel_data.hpp"
+#include "texture_loader.hpp"
+#include "structs.hpp"
 
 // use gl definitions from glbinding 
 using namespace gl;
@@ -12,8 +14,7 @@ using namespace gl;
 class GeometryNode : public Node{
 	public:
 		GeometryNode(Node* t_parent, std::string const& t_name,
-			glm::mat4 const& t_local, glm::mat4 const& t_world,
-			model const& t_model);
+			glm::mat4 const& t_local, glm::mat4 const& t_world);
 
 		GeometryNode(std::string const& t_name,
 			glm::mat4 const& t_local,
@@ -26,8 +27,7 @@ class GeometryNode : public Node{
 			);
 
 		GeometryNode(std::string const& t_name,
-			glm::mat4 const& t_local, glm::mat4 const& t_world,
-			model const& t_model);
+			glm::mat4 const& t_local, glm::mat4 const& t_world);
 		
 		void setDistance(float t_distance);
 		float getDistance() const;
@@ -45,7 +45,8 @@ class GeometryNode : public Node{
 		pixel_data getTexture() const;
 
 		void initTexture();
-		//TODO: getter setter für m_textureObject
+
+		texture_object getTextureObject() const;
 
 		/*
 		void setNormalMap(std::string const& file_name);
@@ -61,7 +62,6 @@ class GeometryNode : public Node{
 
 		pixel_data m_texture;
 		texture_object m_textureObject;
-
 		/*
 		pixel_data m_normalMap;
 		texture_object m_normalMapObject;

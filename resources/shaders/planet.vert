@@ -17,9 +17,6 @@ uniform vec3 LightPosition;
 uniform vec3 LightColor;
 uniform float LightIntensity;
 
-uniform Sampler2D PlanetTexture; // Sampler = uniform variable that represents an accessible texture
-//uniform Sampler2D Normalmap; 
-
 uniform int ShaderMode;
 
 // OUT
@@ -31,7 +28,9 @@ out vec3 pass_LightPosition;
 out vec3 pass_LightColor;
 out float pass_LightIntensity;
 
-out vec4 pass_TextureColor;
+out vec2 pass_TexCoords;
+
+//TODO NormalMap
 
 flat out int pass_ShaderMode;
 
@@ -58,7 +57,8 @@ void main(void)
 	pass_LightIntensity = LightIntensity;
 
 	// Texture
-	vec4 pass_TextureColor = texture(PlanetTexture, in_TexCoords);
+	pass_TexCoords = in_TexCoords;
+
 	// NormalMap?
 
 	// Shadermode

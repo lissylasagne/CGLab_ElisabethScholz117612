@@ -252,7 +252,7 @@ void ApplicationSolar::initializePlanets() {
   GeometryNode* mercury = new GeometryNode("mercury", unitmat, unitmat,
   	10.0f, 1.4f, 1.0f, green, m_resource_path + "textures/mercury.jpg");
 
-  GeometryNode* mercury = new GeometryNode("venus", unitmat, unitmat,
+  GeometryNode* venus = new GeometryNode("venus", unitmat, unitmat,
   	15.0f, 0.9f, 1.0f, green, m_resource_path + "textures/venus.jpg");
 
   GeometryNode* earth = new GeometryNode("earth", unitmat, unitmat,
@@ -316,7 +316,6 @@ void ApplicationSolar::initializeStars(int numberStars) {
 }
 
 void ApplicationSolar::initializeTextures() {
-
 /*
 	pixel_data texture_data = planet.getTexture();
   texture_object texture_obj;
@@ -411,7 +410,7 @@ void ApplicationSolar::renderPlanet(GeometryNode* planet) const {
   // GL_TEXTURE0 - color texture
   // GL_TEXTURE1 - normal map
 
-  glActiveTexture(GL_TEXTURE0)
+  glActiveTexture(GL_TEXTURE0);
   glBindTexture(GL_TEXTURE_2D, planet->getTextureObject().handle);
   glUniform1i(m_shaders.at("planet").u_locs.at("PlanetTexture"), 0);
 

@@ -1,17 +1,13 @@
 #include "geometrynode.hpp"
 
 GeometryNode::GeometryNode(Node* t_parent, std::string const& t_name,
-		glm::mat4 const& t_local, glm::mat4 const& t_world,
-		model const& t_model) :
-	Node{t_parent, t_name, t_local, t_world},
-	m_geometry{t_model}
+		glm::mat4 const& t_local, glm::mat4 const& t_world) :
+	Node{t_parent, t_name, t_local, t_world}
 {}
 
 GeometryNode::GeometryNode(std::string const& t_name,
-		glm::mat4 const& t_local, glm::mat4 const& t_world,
-		model const& t_model) :
-	Node{t_name},
-	m_geometry{t_model}
+		glm::mat4 const& t_local, glm::mat4 const& t_world) :
+	Node{t_name}
 {
 	setLocalTransform(t_local);
 	setWorldTransform(t_world);
@@ -22,7 +18,6 @@ GeometryNode::GeometryNode(std::string const& t_name, glm::mat4 const& t_local,
 			glm::mat4 const& t_world, float t_distance, float t_speed, float t_size,
 			glm::fvec3 t_color, std::string const& file_name) :
 	Node{t_name},
-	m_geometry{t_model},
 	m_distance{t_distance},
 	m_speed{t_speed},
 	m_size{t_size},
@@ -67,13 +62,24 @@ float GeometryNode::getSize() const{
 }
 
 void GeometryNode::setTexture(std::string const& file_name){
-	m_texture = texture_loader::file(std::string const& file_name) 
+	m_texture = texture_loader::file(file_name);
 }
 
 pixel_data GeometryNode::getTexture() const{
 	return m_texture;
 }
 
+texture_object GeometryNode::getTextureObject() const{
+	return m_textureObject;
+}
+
 void GeometryNode::initTexture(){
-	//TODO
+	glActiveTexture(GL_TEXTURE0);
+    glGenTextures(1, &m_textureObject.handle);
+    glBindTexture(GL_TEXTURE_2D, m_textureObject.handle);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+	
+	glTexImage2D(GL_TEXTURE_2D, 0, m_texture.channels, m_texture.width, m_texture.height, 
+			0, m_texture.channels, m_texture.channel_type, m_texture.ptr());
 }
