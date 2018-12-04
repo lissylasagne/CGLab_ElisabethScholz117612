@@ -15,14 +15,14 @@ class GeometryNode : public Node{
 			glm::mat4 const& t_local, glm::mat4 const& t_world,
 			model const& t_model);
 
-		GeometryNode(Node* t_parent,
-			std::string const& t_name,
+		GeometryNode(std::string const& t_name,
 			glm::mat4 const& t_local,
 			glm::mat4 const& t_world,
-			float distance,
-			float speed,
-			float size,
-			glm::fvec3 color,
+			float t_distance,
+			float t_speed,
+			float t_size,
+			glm::fvec3 t_color,
+			std::string const& file_name
 			);
 
 		//TODO: ctor implementieren und im ctor die texturen laden und initialisieren (setTexture ist schon fertig)
@@ -46,10 +46,11 @@ class GeometryNode : public Node{
 		void setTexture(std::string const& file_name);
 		pixel_data getTexture() const;
 
+		void initTexture();
 		//TODO: getter setter für m_textureObject
 
 	private:
-		float m_distanceFromOrigin;
+		float m_distance;
 		float m_speed;
 		float m_size;
 

@@ -17,12 +17,29 @@ GeometryNode::GeometryNode(std::string const& t_name,
 	setWorldTransform(t_world);
 }
 
+// big fat beautiful constructor
+GeometryNode::GeometryNode(std::string const& t_name, glm::mat4 const& t_local,
+			glm::mat4 const& t_world, float t_distance, float t_speed, float t_size,
+			glm::fvec3 t_color, std::string const& file_name) :
+	Node{t_name},
+	m_geometry{t_model},
+	m_distance{t_distance},
+	m_speed{t_speed},
+	m_size{t_size},
+	m_color{t_color}
+{
+	setLocalTransform(t_local);
+	setWorldTransform(t_world);
+	setTexture(file_name);
+	initTexture();
+}
+
 void GeometryNode::setDistance(float t_distance) {
-	m_distanceFromOrigin = t_distance;
+	m_distance = t_distance;
 }
 
 float GeometryNode::getDistance() const {
-	return m_distanceFromOrigin;
+	return m_distance;
 }
 
 void GeometryNode::setSpeed(float t_speed) {
@@ -49,11 +66,14 @@ float GeometryNode::getSize() const{
 	return m_size;
 }
 
-
-void setTexture(std::string const& file_name){
+void GeometryNode::setTexture(std::string const& file_name){
 	m_texture = texture_loader::file(std::string const& file_name) 
 }
 
-pixel_data getTexture() const{
+pixel_data GeometryNode::getTexture() const{
 	return m_texture;
+}
+
+void GeometryNode::initTexture(){
+	//TODO
 }
