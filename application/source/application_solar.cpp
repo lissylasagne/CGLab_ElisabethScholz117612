@@ -103,10 +103,13 @@ void ApplicationSolar::uploadUniforms() {
 
 // load shader sources
 void ApplicationSolar::initializeShaderPrograms() {
-  //blinn phong
+  
+  // PLANETS
+  
   // store shader program objects in container
   m_shaders.emplace("planet", shader_program{{{GL_VERTEX_SHADER,m_resource_path + "shaders/planet.vert"},
                                            {GL_FRAGMENT_SHADER, m_resource_path + "shaders/planet.frag"}}});
+  
   // request uniform locations for shader program
   
   //simple shader uniforms
@@ -121,6 +124,10 @@ void ApplicationSolar::initializeShaderPrograms() {
   m_shaders.at("planet").u_locs["LightPosition"] = -1;
   m_shaders.at("planet").u_locs["LightColor"] = -1;
   m_shaders.at("planet").u_locs["LightIntensity"] = -1;
+
+  //Texture Uniforms
+  m_shaders.at("planet").u_locs["YourTexture"] = -1;
+  //m_shaders.at("planet").u_locs["YourNormalMap"] = -1;
 
   //ShaderMode uniform
   m_shaders.at("planet").u_locs["ShaderMode"] = -1;
@@ -226,13 +233,10 @@ void ApplicationSolar::initializePlanets() {
   
   // Colors
   glm::fvec3 white    = glm::fvec3{1.0f,1.0f,1.0f};
-
   glm::fvec3 green    = glm::fvec3{0.0f,0.6f,0.0f};
   glm::fvec3 red      = glm::fvec3{0.6f,0.0f,0.0f};
   glm::fvec3 blue     = glm::fvec3{0.0f,0.0f,0.6f};
-
   glm::fvec3 yellow   = glm::fvec3{0.8f,0.8f,0.1f};
-
   glm::fmat4 unitmat = glm::fmat4{1.0f};
 
   //create root
@@ -240,42 +244,73 @@ void ApplicationSolar::initializePlanets() {
   m_scene = SceneGraph("scene", root);
 
   //create structure of solar system in scenegraph
-  GeometryNode* sun = new GeometryNode("sun", unitmat, unitmat, m_planet_model);
-  root->addChildren(sun);
-  sun->setDistance(0.0f);
-  sun->setSpeed(1.0f);
-  sun->setSize(4.0f);
-  sun->setColor(yellow); //yellow
+  //distance, speed, size, color
+
+  GeometryNode* sun = new GeometryNode("sun", unitmat, unitmat, 
+  	0.0f, 1.0f, 2.0f, yellow);
   sun->setTexture(m_resource_path + "textures/sun.jpg");
 
-  GeometryNode* mercury = new GeometryNode("mercury", unitmat, unitmat, m_planet_model);
-  sun->addChildren(mercury);
-  mercury->setDistance(15.0f);
-  mercury->setSpeed(1.4f);
-  mercury->setSize(2.0f);
-  mercury->setColor(green);
+  GeometryNode* mercury = new GeometryNode("mercury", unitmat, unitmat,
+  	10.0f, 1.4f, 1.0f, green);
   sun->setTexture(m_resource_path + "textures/mercury.jpg");
 
-  GeometryNode* earth = new GeometryNode("earth", unitmat, unitmat, m_planet_model);
-  sun->addChildren(earth);
-  earth->setDistance(30.0f);
-  earth->setSpeed(0.5f);
-  earth->setSize(5.0f);
-  earth->setColor(red);
+  GeometryNode* mercury = new GeometryNode("venus", unitmat, unitmat,
+  	15.0f, 0.9f, 1.0f, green);
+    sun->setTexture(m_resource_path + "textures/venus.jpg");
+
+  GeometryNode* earth = new GeometryNode("earth", unitmat, unitmat,
+  	20.0f, 0.5f, 1.0f, red);
   sun->setTexture(m_resource_path + "textures/earth.jpg");
 
-  GeometryNode* moon = new GeometryNode("moon", unitmat, unitmat, m_planet_model);
-  earth->addChildren(moon);
-  moon->setDistance(5.0f);
-  moon->setSpeed(0.5f);
-  moon->setSize(1.0f);
-  moon->setColor(blue);
+  GeometryNode* moon = new GeometryNode("moon", unitmat, unitmat,
+  	2.5f, 1.2f, 1.0f, blue);
   sun->setTexture(m_resource_path + "textures/moon.jpg");
 
+  GeometryNode* mars = new GeometryNode("mars", unitmat, unitmat,
+  	25.0f, 1.3f, 1.0f, red);
+  sun->setTexture(m_resource_path + "textures/mars.jpg");
+
+  GeometryNode* jupiter = new GeometryNode("jupiter", unitmat, unitmat,
+  	30.0f, 0.4f, 1.0f, red);
+  sun->setTexture(m_resource_path + "textures/jupiter.jpg");
+
+  GeometryNode* saturn = new GeometryNode("saturn", unitmat, unitmat,
+  	35.0f, 0.8f, 1.0f, red);
+  sun->setTexture(m_resource_path + "textures/saturn.jpg");
+
+  GeometryNode* uranus = new GeometryNode("uranus", unitmat, unitmat,
+  	40.0f, 1.7f, 1.0f, red);
+  sun->setTexture(m_resource_path + "textures/uranus.jpg");
+
+  GeometryNode* neptune = new GeometryNode("neptune", unitmat, unitmat,
+  	45.0f, 1.4f, 1.0f, red);
+  sun->setTexture(m_resource_path + "textures/neptune.jpg");
+
+  GeometryNode* pluto = new GeometryNode("pluto", unitmat, unitmat,
+  	50.0f, 1.9f, 1.0f, red);
+  sun->setTexture(m_resource_path + "textures/pluto.jpg");
+
+
   PointLightNode* sunlight = new PointLightNode("sunlight", unitmat, unitmat);
-  root->addChildren(sunlight);
   sunlight->setIntensity(1.0f);
   sunlight->setColor(white);
+
+  //Assembling Scene Graph
+  root->addChildren(sun);
+  root->addChildren(sunlight);
+
+	  sun->addChildren(mercury);
+	  sun->addChildren(venus);
+
+	  sun->addChildren(earth);
+	  	earth->addChildren(moon);
+
+	  sun->addChildren(mars);
+	  sun->addChildren(jupiter);
+	  sun->addChildren(saturn);
+	  sun->addChildren(uranus);
+	  sun->addChildren(neptune);
+	  sun->addChildren(pluto);
 }
 
 void ApplicationSolar::initializeStars(int numberStars) {
@@ -292,41 +327,27 @@ void ApplicationSolar::initializeStars(int numberStars) {
 }
 
 void ApplicationSolar::initializeTextures() {
-  //std::string texture_path = m_resource_path + "textures/katze1.png";
-  pixel_data data = texture_loader::file(m_resource_path + "textures/katze1.png"); 
-/*
-  glActiveTexture(GL_TEXTURE*);
-  glGenTexture(tex_num, &texture_object);
-  glBindTexture(target, texture_object);
 
-  glTexParametri(target, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-  glTexParametri(target, GL_TEXTURE_MAX_FILTER, GL_LINEAR);
+	// TODO: im GeometryNode Konstruktor direkt machen
+	// Skybox Texturen hier ?? initialisieren
 
-  glTexImage2D(target, level, internalformat, width, height, border, format, type, data);
+	pixel_data texture_data = planet.getTexture();
+  texture_object texture_obj;
 
-  glActiveTexture(GL_TEXTURE k);
-  glBindTexture(target, texture_object);
-  
-  int sampler_location = glGetUniformLocation(program_handle, ‘‘YourTexture’’);
-  glUseProgram(program_handle);
-  glUniform1i(sampler_location, k);
-
-  uniform Sampler2D YourTexture;
-  vec4 colour_from_tex = texture*(YourTexture, tex_coords);
-  
-*/
-
-  texture_object t0;
   glActiveTexture(GL_TEXTURE0);
-  glGenTextures(1, &t0.handle);
-  glBindTexture(GL_TEXTURE_2D, t0.handle);
+  glGenTextures(1, &planet_texture.handle);
+  glBindTexture(GL_TEXTURE_2D, planet_texture.handle);
+
+	//Define Texture Sampling Parameters (mandatory)
   glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAX_FILTER, GL_LINEAR);
   glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
   glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
 
+  //Define Texture Data and Format
+  //glTexImage2D(target, level, internalformat, width, height, border, format, type, data)
   glTexImage2D(GL_TEXTURE_2D, 0, data.channels, data.width, data.height, 0, data.channels, data.channel_type, data.ptr());
-/*
+
   std::string path_normals = m_resource_path + "normal_textures/" + std::to_string(i) + ".png";
   pixel_data pix_dat_normal = texture_loader::file(path_normals); 
 
@@ -339,7 +360,6 @@ void ApplicationSolar::initializeTextures() {
   glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
 
   glTexImage2D(GL_TEXTURE_2D, 0, pix_dat_normal.channels, pix_dat_normal.width, pix_dat_normal.height, 0, pix_dat_normal.channels, pix_dat_normal.channel_type, pix_dat_normal.ptr());
-*/
 }
 
 
@@ -350,22 +370,33 @@ void ApplicationSolar::renderPlanets() const{
 	glUseProgram(m_shaders.at("planet").handle);
 
   GeometryNode* sun = dynamic_cast<GeometryNode*>(m_scene.getRoot()->getChildren("sun"));
-  GeometryNode* mercury = dynamic_cast<GeometryNode*>(sun->getChildren("mercury"));
-  GeometryNode* earth = dynamic_cast<GeometryNode*>(sun->getChildren("earth"));
-  GeometryNode* moon = dynamic_cast<GeometryNode*>(earth->getChildren("moon"));
+	  GeometryNode* mercury = dynamic_cast<GeometryNode*>(sun->getChildren("mercury"));
+	  GeometryNode* venus = dynamic_cast<GeometryNode*>(sun->getChildren("venus"));
+	  GeometryNode* earth = dynamic_cast<GeometryNode*>(sun->getChildren("earth"));
+	  	GeometryNode* moon = dynamic_cast<GeometryNode*>(earth->getChildren("moon"));
+	  GeometryNode* mars = dynamic_cast<GeometryNode*>(sun->getChildren("mars"));
+	  GeometryNode* jupiter = dynamic_cast<GeometryNode*>(sun->getChildren("jupiter"));
+	  GeometryNode* saturn = dynamic_cast<GeometryNode*>(sun->getChildren("saturn"));
+	  GeometryNode* uranus = dynamic_cast<GeometryNode*>(sun->getChildren("uranus"));
+	  GeometryNode* neptune = dynamic_cast<GeometryNode*>(earth->getChildren("neptune"));
+	  GeometryNode* pluto = dynamic_cast<GeometryNode*>(earth->getChildren("pluto"));
+  
   renderPlanet(sun);
-  renderPlanet(m_planet_model);
+  renderPlanet(mercury);
+  renderPlanet(venus);
   renderPlanet(earth);
   renderPlanet(moon);
+  renderPlanet(mars);
+  renderPlanet(jupiter);
+  renderPlanet(saturn);
+  renderPlanet(uranus);
+  renderPlanet(neptune);
+  renderPlanet(pluto);
 }
 
 //deal with gl
 void ApplicationSolar::renderPlanet(GeometryNode* planet) const {
   glm::fmat4 model_matrix = glm::fmat4{1.0};
-  
-  //TODO
-  //the moon specific transformation should be shifted to updating the world_transformation with the parents and local transformations
-  //scaling klappt nicht so richtig... 
   //model_matrix = glm::scale(model_matrix, glm::fvec3(planet->getSize()));
 
   // if the planet is a moon, then the transformations to the parent planets position need to happen first
@@ -385,24 +416,13 @@ void ApplicationSolar::renderPlanet(GeometryNode* planet) const {
   model_matrix = glm::rotate(model_matrix, float(glfwGetTime())*planet->getSpeed(), glm::fvec3{0.0f, 1.0f, 0.0f});
   model_matrix = glm::translate(model_matrix, glm::fvec3{planet->getDistance(), 0.0f, 0.0f});
 
-  // give model_matrix to shader
+  // Give data to shader
   glUniformMatrix4fv(m_shaders.at("planet").u_locs.at("ModelMatrix"),
                      1, GL_FALSE, glm::value_ptr(model_matrix));
 
   glm::fvec3 planetColor = planet->getColor();
   glUniform3f(m_shaders.at("planet").u_locs.at("PlanetColor"), planetColor.x, planetColor.y, planetColor.z);
-/*
-  //planet textures
-  //was noch gemacht werden muss: eine funktion die einen vector planet_handle anlegt, in dem texture_objects sind, die dann auch in initializeTextures genutz werden
-  glActiveTexture(GL_TEXTURE0);
-  glBindTexture(GL_TEXTURE_2D, planet_texture[?].handle); //? = anzahl der planeten 
-  int color_sampler_location = glGetUniformLocation(m_shaders.at("planet").handle, "ColorTex");
-  glUniform1i(color_sampler_location, 0);
 
-  glActiveTexture(GL_TEXTURE1);
-  glBindTexture(GL_TEXTURE_2D, normal_texture[10].handle);
-  glUniform1i(glGetUniformLocation(m_shaders.at("planet").handle, "NormalTexture"), 1);
-*/
   // extra matrix for normal transformation to keep them orthogonal to surface
   glm::fmat4 normal_matrix = glm::inverseTranspose(glm::inverse(m_view_transform) * model_matrix);
   //give normal matrix to shader
@@ -415,6 +435,42 @@ void ApplicationSolar::renderPlanet(GeometryNode* planet) const {
   glUniform3f(m_shaders.at("planet").u_locs.at("LightPosition"), 0.0f, 0.0f, 0.0f);
   glUniform1f(m_shaders.at("planet").u_locs.at("LightIntensity"), sunlightNode->getIntensity());
   glUniform3f(m_shaders.at("planet").u_locs.at("LightColor"), lightColor.x, lightColor.y, lightColor.z);
+
+
+
+  // TEXTUREN
+
+  //TODO hier aufräumen
+ 
+  glActiveTexture(GL_TEXTURE*);
+  glBindTexture(GL_TEXTURE_2D, planet_texture[?].handle); //? = anzahl der planeten 
+  int color_sampler_location = glGetUniformLocation(m_shaders.at("planet").handle, "ColorTex");
+  glUniform1i(color_sampler_location, 0);
+
+  glActiveTexture(GL_TEXTURE1);
+  glBindTexture(GL_TEXTURE_2D, normal_texture[10].handle);
+  glUniform1i(glGetUniformLocation(m_shaders.at("planet").handle, "NormalTexture"), 1);
+
+  //Bind Texture for Accessing
+  glActiveTexture(GL_TEXTURE0);
+  //glBindTexture(target, texture_object)
+  //target ist enum Art der Textur,
+  //texture_object ist ein GLuint, der den Texturnamen spezifiziert
+  glBindTexture(GL_TEXTURE_2D, planet->getTextureObject().handle);
+
+  // Upload Texture Unit Data to Shader
+  //int sampler_location = glGetUniformLocation(m_shaders.at("planet").handle,"YourTexture");
+	//glUniform1i(sampler_location, 0);
+
+  glUniform1i(m_shaders.at("planet").u_locs.at("PlanetTexture"), 0);
+
+	//Same for NormalMap
+  glActiveTexture(GL_TEXTURE1);
+  glBindTexture(GL_TEXTURE_2D, planet_texture[?].handle);
+  int sampler_location = glGetUniformLocation(m_shaders.at("planet").handle,"YourNormalMap");
+	glUniform1i(sampler_location, 1);
+
+
 
   //give shadermode to shader
   if(m_shading_mode == "blinn_phong"){

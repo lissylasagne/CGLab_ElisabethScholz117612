@@ -16,6 +16,9 @@ uniform vec3 LightPosition;
 uniform vec3 LightColor;
 uniform float LightIntensity;
 
+// TODO
+uniform Sampler2D YourTexture; // Sampler = uniform variable that represents an accessible texture
+
 uniform int ShaderMode;
 
 // OUT
@@ -54,6 +57,9 @@ void main(void)
 	pass_LightPosition = (ViewMatrix*vec4(LightPosition,1.0f)).xyz;
 	pass_LightColor = LightColor;
 	pass_LightIntensity = LightIntensity;
+
+	// Texture
+	vec4 colour from tex = texture*(YourTexture, tex coords)
 
 	pass_ShaderMode = ShaderMode;
 }

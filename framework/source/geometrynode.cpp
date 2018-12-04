@@ -17,14 +17,6 @@ GeometryNode::GeometryNode(std::string const& t_name,
 	setWorldTransform(t_world);
 }
 
-model GeometryNode::getGeometry(){
-	return m_geometry;
-}
-
-void GeometryNode::setGeometry(model t_geometry){
- 	m_geometry = t_geometry;
-}
-
 void GeometryNode::setDistance(float t_distance) {
 	m_distanceFromOrigin = t_distance;
 }

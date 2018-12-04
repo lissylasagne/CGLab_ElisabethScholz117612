@@ -14,15 +14,22 @@ class GeometryNode : public Node{
 		GeometryNode(Node* t_parent, std::string const& t_name,
 			glm::mat4 const& t_local, glm::mat4 const& t_world,
 			model const& t_model);
+
+		GeometryNode(Node* t_parent,
+			std::string const& t_name,
+			glm::mat4 const& t_local,
+			glm::mat4 const& t_world,
+			float distance,
+			float speed,
+			float size,
+			glm::fvec3 color,
+			);
+
+		//TODO: ctor implementieren und im ctor die texturen laden und initialisieren (setTexture ist schon fertig)
+
 		GeometryNode(std::string const& t_name,
 			glm::mat4 const& t_local, glm::mat4 const& t_world,
 			model const& t_model);
-
-		// TODO
-		// update c'tors here and in application_solar
-
-		model getGeometry();
-		void setGeometry(model t_geometry);
 		
 		void setDistance(float t_distance);
 		float getDistance() const;
@@ -39,14 +46,19 @@ class GeometryNode : public Node{
 		void setTexture(std::string const& file_name);
 		pixel_data getTexture() const;
 
+		//TODO: getter setter für m_textureObject
+
 	private:
-		model m_geometry;
 		float m_distanceFromOrigin;
 		float m_speed;
-		glm::fvec3 m_color;
 		float m_size;
 
-		pixel_data m_normalmap;
+		glm::fvec3 m_color;
+
+		pixel_data m_texture;
+		texture_object m_textureObject;
+
+		//pixel_data m_normalmap;
 };
 
 #endif
