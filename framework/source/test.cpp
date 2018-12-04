@@ -7,7 +7,7 @@
 #include "cameranode.hpp"
 
 TEST_CASE("node","[node]") {
-
+/*
 	SECTION("constructor, getter") {
 		glm::mat4 mat1 = glm::mat4(1.0);
 		glm::mat4 mat2 = glm::mat4(0.0);
@@ -52,9 +52,11 @@ TEST_CASE("node","[node]") {
 		std::cout<<c.getPath();
 		std::cout<<c.getDepth();
 	}
+*/
 }
 
 TEST_CASE("cameranode","[cameranode]") {
+	/*
 	glm::mat4 mat1 = glm::mat4(1.0);
 	glm::mat4 mat2 = glm::mat4(0.0);
 
@@ -66,6 +68,7 @@ TEST_CASE("cameranode","[cameranode]") {
 	GeometryNode sub_geo{&geo, "geo", mat1, mat2, testmodel};
 
 	SceneGraph testscene{"testscene", &geo};
+	*/
 }
 
 
