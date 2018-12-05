@@ -37,7 +37,7 @@ void main() {
 	}
 	else if (pass_ShaderMode == 3){
 		// using TextureColor
-		vec4 textureColor = texture(PlanetTexture, pass_TexCoords);
+		vec4 textureColor = texture(pass_PlanetTexture, pass_TexCoords);
 		ambient_color = textureColor.xyz * 0.01;
 		diffuse_color = textureColor.xyz;
 		specular_color = textureColor.xyz * 1.2;//pass_LightColor;

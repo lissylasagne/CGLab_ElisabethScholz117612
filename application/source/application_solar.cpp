@@ -240,7 +240,7 @@ void ApplicationSolar::initializeStarGeometry() {
 
 //iterate trough the SceneGraph and transform and render the Planets
 void ApplicationSolar::initializePlanets() {
-  
+  std::cout << "init planets\n";
   // Colors
   glm::fvec3 white    = glm::fvec3{1.0f,1.0f,1.0f};
   glm::fvec3 green    = glm::fvec3{0.0f,0.6f,0.0f};
@@ -288,19 +288,6 @@ void ApplicationSolar::initializePlanets() {
 
   GeometryNode* pluto = new GeometryNode("pluto", unitmat, unitmat,
   	50.0f, 1.9f, 1.0f, red, m_resource_path + "textures/pluto.jpg");
-
-  sun->initTexture();
-  mercury->initTexture();
-  venus->initTexture();
-  earth->initTexture();
-  moon->initTexture();
-  mars->initTexture();
-  jupiter->initTexture();
-  saturn->initTexture();
-  uranus->initTexture();
-  neptune->initTexture();
-  pluto->initTexture();
-
 
   PointLightNode* sunlight = new PointLightNode("sunlight", unitmat, unitmat);
   sunlight->setIntensity(1.0f);
@@ -383,6 +370,7 @@ void ApplicationSolar::initializeSkybox() {
 
 //deal with traversing the SceneGraph
 void ApplicationSolar::renderPlanets() const{
+	std::cout << "\n rendering the planets\n";
 	glUseProgram(m_shaders.at("planet").handle);
 
   GeometryNode* sun = dynamic_cast<GeometryNode*>(m_scene.getRoot()->getChildren("sun"));
@@ -396,17 +384,20 @@ void ApplicationSolar::renderPlanets() const{
 	  GeometryNode* uranus = dynamic_cast<GeometryNode*>(sun->getChildren("uranus"));
 	  GeometryNode* neptune = dynamic_cast<GeometryNode*>(earth->getChildren("neptune"));
 	  GeometryNode* pluto = dynamic_cast<GeometryNode*>(earth->getChildren("pluto"));
-  
+  	
   renderPlanet(sun);
+
   renderPlanet(mercury);
   renderPlanet(venus);
   renderPlanet(earth);
   renderPlanet(moon);
+
   renderPlanet(mars);
   renderPlanet(jupiter);
   renderPlanet(saturn);
   renderPlanet(uranus);
   renderPlanet(neptune);
+
   renderPlanet(pluto);
 }
 
@@ -438,7 +429,9 @@ void ApplicationSolar::renderPlanet(GeometryNode* planet) const {
 
 	// TEXTURES
   // GL_TEXTURE0 - color texture
-  // GL_TEXTURE1 - normal map
+  // GL_TEXTURE1 - normal ma
+  int name = planet->getTextureObject().handle;
+  std::cout << "texture handle: " << name;
 
   glActiveTexture(GL_TEXTURE0);
   glBindTexture(GL_TEXTURE_2D, planet->getTextureObject().handle);

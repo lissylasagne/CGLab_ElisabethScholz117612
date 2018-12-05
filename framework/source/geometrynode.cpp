@@ -74,9 +74,10 @@ texture_object GeometryNode::getTextureObject() const{
 }
 
 void GeometryNode::initTexture(){
+	texture_object temp{};
 	glActiveTexture(GL_TEXTURE0);
-    glGenTextures(1, &m_textureObject.handle);
-    glBindTexture(GL_TEXTURE_2D, m_textureObject.handle);
+    glGenTextures(1, &temp.handle);
+    glBindTexture(GL_TEXTURE_2D, temp.handle);
     
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
@@ -84,4 +85,8 @@ void GeometryNode::initTexture(){
 	glTexImage2D(GL_TEXTURE_2D, 0, m_texture.channels, m_texture.width, m_texture.height, 
 			0, m_texture.channels, m_texture.channel_type, m_texture.ptr());
 
+	std::cout << "texture_object: ";
+	std::cout << temp.handle;
+	std::cout << "\n";
+	m_textureObject = temp;
 }

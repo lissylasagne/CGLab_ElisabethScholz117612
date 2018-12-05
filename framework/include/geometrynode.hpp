@@ -8,6 +8,10 @@
 #include "texture_loader.hpp"
 #include "structs.hpp"
 
+
+#include <iostream>
+
+
 // use gl definitions from glbinding 
 using namespace gl;
 
@@ -43,7 +47,6 @@ class GeometryNode : public Node{
 
 		void setTexture(std::string const& file_name);
 		pixel_data getTexture() const;
-
 
 		texture_object getTextureObject() const;
 
