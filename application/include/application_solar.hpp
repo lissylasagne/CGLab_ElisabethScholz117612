@@ -31,7 +31,8 @@ class ApplicationSolar : public Application {
   void initializeStarGeometry();
   void initializePlanets();
   void initializeStars(int numberStars);
-  void initializeTextures();
+  //void initializeTextures();
+  void initializeSkybox();
 
   // update uniform values
   void uploadUniforms();
@@ -54,6 +55,7 @@ class ApplicationSolar : public Application {
   model_object planet_object;
   model_object star_object;
   model_object texture_object;
+  model_object skybox_object;
   
   // camera transform matrix
   glm::fmat4 m_view_transform;

@@ -117,7 +117,7 @@ void ApplicationSolar::initializeShaderPrograms() {
   m_shaders.at("planet").u_locs["ModelMatrix"] = -1;
   m_shaders.at("planet").u_locs["ViewMatrix"] = -1; // = daraus camera position ableiten?
   m_shaders.at("planet").u_locs["ProjectionMatrix"] = -1;
-  //m_shaders.at("planet").u_locs["PlanetColor"] = -1; // = diffuse and ambient color
+  m_shaders.at("planet").u_locs["PlanetColor"] = -1; // = diffuse and ambient color
   //m_shaders.at("planet").u_locs["NormalTexture"] = -1;
 
   //planet shader specific uniforms
@@ -127,7 +127,7 @@ void ApplicationSolar::initializeShaderPrograms() {
 
   //Texture Uniforms
   m_shaders.at("planet").u_locs["pass_PlanetTexture"] = -1;
-  //m_shaders.at("planet").u_locs["YourNormalMap"] = -1;
+  //m_shaders.at("planet").u_locs["pass_NormalTexture"] = -1;
 
   //ShaderMode uniform
   m_shaders.at("planet").u_locs["ShaderMode"] = -1;
@@ -237,7 +237,7 @@ void ApplicationSolar::initializePlanets() {
   glm::fvec3 red      = glm::fvec3{0.6f,0.0f,0.0f};
   glm::fvec3 blue     = glm::fvec3{0.0f,0.0f,0.6f};
   glm::fvec3 yellow   = glm::fvec3{0.8f,0.8f,0.1f};
-  glm::fmat4 unitmat = glm::fmat4{1.0f};
+  glm::fmat4 unitmat  = glm::fmat4{1.0f};
 
   //create root
   Node* root = new Node("root");
@@ -279,6 +279,18 @@ void ApplicationSolar::initializePlanets() {
   GeometryNode* pluto = new GeometryNode("pluto", unitmat, unitmat,
   	50.0f, 1.9f, 1.0f, red, m_resource_path + "textures/pluto.jpg");
 
+  sun->initTexture();
+  mercury->initTexture();
+  venus->initTexture();
+  earth->initTexture();
+  moon->initTexture();
+  mars->initTexture();
+  jupiter->initTexture();
+  saturn->initTexture();
+  uranus->initTexture();
+  neptune->initTexture();
+  pluto->initTexture();
+
 
   PointLightNode* sunlight = new PointLightNode("sunlight", unitmat, unitmat);
   sunlight->setIntensity(1.0f);
@@ -315,7 +327,11 @@ void ApplicationSolar::initializeStars(int numberStars) {
   }
 }
 
-void ApplicationSolar::initializeTextures() {
+//void ApplicationSolar::initializeTextures() {
+
+  //hier init texture aus geometrynode aufrufen
+
+
 /*
 	pixel_data texture_data = planet.getTexture();
   texture_object texture_obj;
@@ -346,6 +362,10 @@ void ApplicationSolar::initializeTextures() {
   glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
   glTexImage2D(GL_TEXTURE_2D, 0, pix_dat_normal.channels, pix_dat_normal.width, pix_dat_normal.height, 0, pix_dat_normal.channels, pix_dat_normal.channel_type, pix_dat_normal.ptr());
 */
+//}
+
+void ApplicationSolar::initializeSkybox() {
+
 }
 
 

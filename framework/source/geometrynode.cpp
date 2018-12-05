@@ -77,6 +77,7 @@ void GeometryNode::initTexture(){
 	glActiveTexture(GL_TEXTURE0);
     glGenTextures(1, &m_textureObject.handle);
     glBindTexture(GL_TEXTURE_2D, m_textureObject.handle);
+    
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 	
