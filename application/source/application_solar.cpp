@@ -40,8 +40,6 @@ ApplicationSolar::ApplicationSolar(std::string const& resource_path)
   //init shaders
   initializeShaderPrograms();
 
-  //init textures
-  //initializeTextures();
 }
 
 ApplicationSolar::~ApplicationSolar() {
@@ -324,43 +322,6 @@ void ApplicationSolar::initializeStars(int numberStars) {
   }
 }
 
-//void ApplicationSolar::initializeTextures() {
-
-  //hier init texture aus geometrynode aufrufen
-
-
-/*
-	pixel_data texture_data = planet.getTexture();
-  texture_object texture_obj;
-
-  glActiveTexture(GL_TEXTURE0);
-  glGenTextures(1, &planet_texture.handle);
-  glBindTexture(GL_TEXTURE_2D, planet_texture.handle);
-
-	//Define Texture Sampling Parameters (mandatory)
-  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAX_FILTER, GL_LINEAR);
-  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
-  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
-
-  //Define Texture Data and Format
-  //glTexImage2D(target, level, internalformat, width, height, border, format, type, data)
-  glTexImage2D(GL_TEXTURE_2D, 0, texture_data.channels, texture_data.width, texture_data.height, 0, texture_data.channels, texture_data.channel_type, texture_data.ptr());
-
-  std::string path_normals = m_resource_path + "normal_textures/" + std::to_string(i) + ".png";
-  pixel_data pix_dat_normal = texture_loader::file(path_normals); 
-
-  glActiveTexture(GL_TEXTURE1);
-  glGenTextures(1, &normal_texture[i].handle);
-  glBindTexture(GL_TEXTURE_2D, normal_texture[i].handle);
-  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
-  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
-  glTexImage2D(GL_TEXTURE_2D, 0, pix_dat_normal.channels, pix_dat_normal.width, pix_dat_normal.height, 0, pix_dat_normal.channels, pix_dat_normal.channel_type, pix_dat_normal.ptr());
-*/
-//}
-
 void ApplicationSolar::initializeSkybox() {
 
 }
@@ -432,19 +393,13 @@ void ApplicationSolar::renderPlanet(GeometryNode* planet) const {
 
 	// TEXTURES
   // GL_TEXTURE0 - color texture
-  // GL_TEXTURE1 - normal ma
   int name = planet->getTextureObject().handle;
   std::cout << "texture handle: " << name << "\n";
-
+  //Bind Texture for Accessing
   glActiveTexture(GL_TEXTURE0);
   glBindTexture(GL_TEXTURE_2D, planet->getTextureObject().handle);
+  // upload Texture data
   glUniform1i(m_shaders.at("planet").u_locs.at("pass_PlanetTexture"), 0);
-
-	/*
-  glActiveTexture(GL_TEXTURE1);
-  glBindTexture(GL_TEXTURE_2D, planet->getNormalTextureObject().handle);
-  glUniform1i(glGetUniformLocation(m_shaders.at("planet").handle, "NormalTexture"), 1);
-	*/
 
   // SHADERMODE
   if(m_shading_mode == "blinn_phong"){
