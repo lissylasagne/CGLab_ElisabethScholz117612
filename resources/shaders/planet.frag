@@ -11,7 +11,8 @@ in float pass_LightIntensity;
 
 in vec2 pass_TexCoords;
 
-uniform sampler2D PlanetTexture;
+uniform sampler2D pass_PlanetTexture;
+//uniform sampler2D pass_NormalTexture;
 
 flat in int pass_ShaderMode;
 
@@ -106,7 +107,7 @@ void main() {
 	}
 
 	// NORMALES SHADING
-	else{ homogColor = total_color; }
+	else{ homogColor = total_color;}
 
 	// Gamma-Correction (with Screen-Gamma 2.2)
 	out_Color = vec4(homogColor, 1.0);

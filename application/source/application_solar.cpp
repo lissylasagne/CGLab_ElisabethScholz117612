@@ -41,7 +41,7 @@ ApplicationSolar::ApplicationSolar(std::string const& resource_path)
   initializeShaderPrograms();
 
   //init textures
-  initializeTextures();
+  //initializeTextures();
 }
 
 ApplicationSolar::~ApplicationSolar() {
@@ -125,8 +125,8 @@ void ApplicationSolar::initializeShaderPrograms() {
   m_shaders.at("planet").u_locs["LightIntensity"] = -1;
 
   //Texture Uniforms
-  m_shaders.at("planet").u_locs["PlanetTexture"] = -1;
-  //m_shaders.at("planet").u_locs["YourNormalMap"] = -1;
+  m_shaders.at("planet").u_locs["pass_PlanetTexture"] = -1;
+  //m_shaders.at("planet").u_locs["pass_NormalTexture"] = -1;
 
   //ShaderMode uniform
   m_shaders.at("planet").u_locs["ShaderMode"] = -1;
@@ -163,6 +163,11 @@ void ApplicationSolar::initializePlanetGeometry() {
   glEnableVertexAttribArray(1);
   // second attribute is 3 floats with no offset & stride
   glVertexAttribPointer(1, model::NORMAL.components, model::NORMAL.type, GL_FALSE, m_planet_model.vertex_bytes, m_planet_model.offsets[model::NORMAL]);
+  // activate third attribute on gpu
+  glEnableVertexAttribArray(2);
+  // second attribute is 2 floats with no offset & stride
+  glVertexAttribPointer(2, model::TEXCOORD.components, model::TEXCOORD.type, GL_FALSE, m_planet_model.vertex_bytes, m_planet_model.offsets[model::TEXCOORD]);
+
 
    // generate generic buffer
   glGenBuffers(1, &planet_object.element_BO);
@@ -217,6 +222,12 @@ void ApplicationSolar::initializeStarGeometry() {
   glVertexAttribPointer(1, model::NORMAL.components, model::NORMAL.type,
    GL_FALSE, star_model.vertex_bytes, star_model.offsets[model::NORMAL]);
 
+   // activate third attribute on gpu
+  glEnableVertexAttribArray(2);
+  // second attribute is 2 floats with no offset & stride
+  glVertexAttribPointer(2, model::TEXCOORD.components, model::TEXCOORD.type,
+   GL_FALSE, m_planet_model.vertex_bytes, m_planet_model.offsets[model::TEXCOORD]);
+
   //Deleted generation of generic buffer
 
   // store type of primitive to draw
@@ -236,7 +247,7 @@ void ApplicationSolar::initializePlanets() {
   glm::fvec3 red      = glm::fvec3{0.6f,0.0f,0.0f};
   glm::fvec3 blue     = glm::fvec3{0.0f,0.0f,0.6f};
   glm::fvec3 yellow   = glm::fvec3{0.8f,0.8f,0.1f};
-  glm::fmat4 unitmat = glm::fmat4{1.0f};
+  glm::fmat4 unitmat  = glm::fmat4{1.0f};
 
   //create root
   Node* root = new Node("root");
@@ -278,6 +289,18 @@ void ApplicationSolar::initializePlanets() {
   GeometryNode* pluto = new GeometryNode("pluto", unitmat, unitmat,
   	50.0f, 1.9f, 1.0f, red, m_resource_path + "textures/pluto.jpg");
 
+  sun->initTexture();
+  mercury->initTexture();
+  venus->initTexture();
+  earth->initTexture();
+  moon->initTexture();
+  mars->initTexture();
+  jupiter->initTexture();
+  saturn->initTexture();
+  uranus->initTexture();
+  neptune->initTexture();
+  pluto->initTexture();
+
 
   PointLightNode* sunlight = new PointLightNode("sunlight", unitmat, unitmat);
   sunlight->setIntensity(1.0f);
@@ -314,7 +337,11 @@ void ApplicationSolar::initializeStars(int numberStars) {
   }
 }
 
-void ApplicationSolar::initializeTextures() {
+//void ApplicationSolar::initializeTextures() {
+
+  //hier init texture aus geometrynode aufrufen
+
+
 /*
 	pixel_data texture_data = planet.getTexture();
   texture_object texture_obj;
@@ -345,6 +372,10 @@ void ApplicationSolar::initializeTextures() {
   glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
   glTexImage2D(GL_TEXTURE_2D, 0, pix_dat_normal.channels, pix_dat_normal.width, pix_dat_normal.height, 0, pix_dat_normal.channels, pix_dat_normal.channel_type, pix_dat_normal.ptr());
 */
+//}
+
+void ApplicationSolar::initializeSkybox() {
+
 }
 
 
