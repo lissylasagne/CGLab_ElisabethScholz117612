@@ -38,9 +38,15 @@ void main() {
 	else if (pass_ShaderMode == 3){
 		// using TextureColor
 		vec4 textureColor = texture(pass_PlanetTexture, pass_TexCoords);
+/*
+		// using PlanetColor
+		ambient_color = pass_Color.xyz * 0.01;
+		diffuse_color = textureColor.xyz * 0.1;
+		specular_color = pass_Color * 1.2;//pass_LightColor;	
+		*/
 		ambient_color = textureColor.xyz * 0.01;
-		diffuse_color = textureColor.xyz;
-		specular_color = textureColor.xyz * 1.2;//pass_LightColor;
+		diffuse_color = textureColor.xyz * 0.1;
+		specular_color = textureColor.xyz * 0.5;//pass_LightColor;
 	}
 	else{
 		// using PlanetColor
@@ -111,6 +117,8 @@ void main() {
 
 	// Gamma-Correction (with Screen-Gamma 2.2)
 	out_Color = vec4(homogColor, 1.0);
+	out_Color = normalize(out_Color);
+	//out_Color = texture(pass_PlanetTexture, pass_TexCoords);
 	//vec4(pow(homogColor, vec3(1.0/2.2)), 1.0);
 }
 

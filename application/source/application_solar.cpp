@@ -257,37 +257,37 @@ void ApplicationSolar::initializePlanets() {
   //distance, speed, size, color
 
   GeometryNode* sun = new GeometryNode("sun", unitmat, unitmat, 
-  	0.0f, 1.0f, 2.0f, yellow, m_resource_path + "textures/sun.jpg");
+  	0.0f, 1.0f, 2.0f, yellow, m_resource_path + "textures/sun.png");
 
   GeometryNode* mercury = new GeometryNode("mercury", unitmat, unitmat,
-  	10.0f, 1.4f, 1.0f, green, m_resource_path + "textures/mercury.jpg");
+  	10.0f, 1.4f, 1.0f, green, m_resource_path + "textures/mercury.png");
 
   GeometryNode* venus = new GeometryNode("venus", unitmat, unitmat,
-  	15.0f, 0.9f, 1.0f, green, m_resource_path + "textures/venus.jpg");
+  	15.0f, 0.9f, 1.0f, green, m_resource_path + "textures/venus.png");
 
   GeometryNode* earth = new GeometryNode("earth", unitmat, unitmat,
-  	20.0f, 0.5f, 1.0f, red, m_resource_path + "textures/earth.jpg");
+  	20.0f, 0.5f, 1.0f, red, m_resource_path + "textures/earth.png");
 
   GeometryNode* moon = new GeometryNode("moon", unitmat, unitmat,
-  	2.5f, 1.2f, 1.0f, blue, m_resource_path + "textures/moon.jpg");
+  	2.5f, 1.2f, 1.0f, blue, m_resource_path + "textures/moon.png");
 
   GeometryNode* mars = new GeometryNode("mars", unitmat, unitmat,
-  	25.0f, 1.3f, 1.0f, red, m_resource_path + "textures/mars.jpg");
+  	25.0f, 1.3f, 1.0f, red, m_resource_path + "textures/mars.png");
 
   GeometryNode* jupiter = new GeometryNode("jupiter", unitmat, unitmat,
-  	30.0f, 0.4f, 1.0f, red, m_resource_path + "textures/jupiter.jpg");
+  	30.0f, 0.4f, 1.0f, red, m_resource_path + "textures/jupiter.png");
 
   GeometryNode* saturn = new GeometryNode("saturn", unitmat, unitmat,
-  	35.0f, 0.8f, 1.0f, red, m_resource_path + "textures/saturn.jpg");
+  	35.0f, 0.8f, 1.0f, red, m_resource_path + "textures/saturn.png");
 
   GeometryNode* uranus = new GeometryNode("uranus", unitmat, unitmat,
-  	40.0f, 1.7f, 1.0f, red, m_resource_path + "textures/uranus.jpg");
+  	40.0f, 1.7f, 1.0f, red, m_resource_path + "textures/uranus.png");
 
   GeometryNode* neptune = new GeometryNode("neptune", unitmat, unitmat,
-  	45.0f, 1.4f, 1.0f, red, m_resource_path + "textures/neptune.jpg");
+  	45.0f, 1.4f, 1.0f, red, m_resource_path + "textures/neptune.png");
 
   GeometryNode* pluto = new GeometryNode("pluto", unitmat, unitmat,
-  	50.0f, 1.9f, 1.0f, red, m_resource_path + "textures/pluto.jpg");
+  	50.0f, 1.9f, 1.0f, red, m_resource_path + "textures/pluto.png");
 
   PointLightNode* sunlight = new PointLightNode("sunlight", unitmat, unitmat);
   sunlight->setIntensity(1.0f);
