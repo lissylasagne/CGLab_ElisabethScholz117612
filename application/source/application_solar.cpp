@@ -372,7 +372,6 @@ void ApplicationSolar::initializeSkybox() {
 void ApplicationSolar::renderPlanets() const{
 	std::cout << "\n rendering the planets\n";
 	glUseProgram(m_shaders.at("planet").handle);
-
   GeometryNode* sun = dynamic_cast<GeometryNode*>(m_scene.getRoot()->getChildren("sun"));
 	  GeometryNode* mercury = dynamic_cast<GeometryNode*>(sun->getChildren("mercury"));
 	  GeometryNode* venus = dynamic_cast<GeometryNode*>(sun->getChildren("venus"));
@@ -384,7 +383,7 @@ void ApplicationSolar::renderPlanets() const{
 	  GeometryNode* uranus = dynamic_cast<GeometryNode*>(sun->getChildren("uranus"));
 	  GeometryNode* neptune = dynamic_cast<GeometryNode*>(earth->getChildren("neptune"));
 	  GeometryNode* pluto = dynamic_cast<GeometryNode*>(earth->getChildren("pluto"));
-  	
+
   renderPlanet(sun);
 
   renderPlanet(mercury);
@@ -395,30 +394,33 @@ void ApplicationSolar::renderPlanets() const{
   renderPlanet(mars);
   renderPlanet(jupiter);
   renderPlanet(saturn);
-  renderPlanet(uranus);
-  renderPlanet(neptune);
+  //renderPlanet(uranus);
+  //renderPlanet(neptune);
 
-  renderPlanet(pluto);
+  //renderPlanet(pluto);
 }
 
 //deal with gl
 void ApplicationSolar::renderPlanet(GeometryNode* planet) const {
-  
+  std::cout << "started renderng\n";
   // **** Upload data to shader *****
 
   // MODEL MATRIX DATA
   glm::fmat4 model_matrix = makeModelMatrix(planet);
   glUniformMatrix4fv(m_shaders.at("planet").u_locs.at("ModelMatrix"),
                      1, GL_FALSE, glm::value_ptr(model_matrix));
+  std::cout << "finished matrix data\n";
 
   // PLANET COLOR DATA
   glm::fvec3 planetColor = planet->getColor();
   glUniform3f(m_shaders.at("planet").u_locs.at("PlanetColor"), planetColor.x, planetColor.y, planetColor.z);
+  std::cout << "finished color data\n";
 
   // NORMAL MATRIX DATA (extra matrix for normal transformation to keep them orthogonal to surface)
   glm::fmat4 normal_matrix = glm::inverseTranspose(glm::inverse(m_view_transform) * model_matrix);
   glUniformMatrix4fv(m_shaders.at("planet").u_locs.at("NormalMatrix"),
                      1, GL_FALSE, glm::value_ptr(normal_matrix));
+  std::cout << "finished normal matrix data\n";
 
   //SUNLIGHT DATA
   PointLightNode* sunlightNode = dynamic_cast<PointLightNode*>(m_scene.getRoot()->getChildren("sunlight"));
@@ -426,16 +428,17 @@ void ApplicationSolar::renderPlanet(GeometryNode* planet) const {
   glUniform3f(m_shaders.at("planet").u_locs.at("LightPosition"), 0.0f, 0.0f, 0.0f);
   glUniform1f(m_shaders.at("planet").u_locs.at("LightIntensity"), sunlightNode->getIntensity());
   glUniform3f(m_shaders.at("planet").u_locs.at("LightColor"), lightColor.x, lightColor.y, lightColor.z);
+  std::cout << "finished sunlight data\n";
 
 	// TEXTURES
   // GL_TEXTURE0 - color texture
   // GL_TEXTURE1 - normal ma
   int name = planet->getTextureObject().handle;
-  std::cout << "texture handle: " << name;
+  std::cout << "texture handle: " << name << "\n";
 
   glActiveTexture(GL_TEXTURE0);
   glBindTexture(GL_TEXTURE_2D, planet->getTextureObject().handle);
-  glUniform1i(m_shaders.at("planet").u_locs.at("PlanetTexture"), 0);
+  glUniform1i(m_shaders.at("planet").u_locs.at("pass_PlanetTexture"), 0);
 
 	/*
   glActiveTexture(GL_TEXTURE1);
@@ -453,10 +456,12 @@ void ApplicationSolar::renderPlanet(GeometryNode* planet) const {
   else if (m_shading_mode == "textures"){
   	glUniform1i(m_shaders.at("planet").u_locs.at("ShaderMode"), 3);
   }
+  std::cout << "finished shader data\n";
 
   // VAO
   glBindVertexArray(planet_object.vertex_AO);
   glDrawElements(planet_object.draw_mode, planet_object.num_elements, model::INDEX.type, NULL);
+  std::cout << "finished vao\n";
 }
 
 glm::fmat4 ApplicationSolar::makeModelMatrix(GeometryNode* planet) const{
