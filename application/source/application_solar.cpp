@@ -41,7 +41,7 @@ ApplicationSolar::ApplicationSolar(std::string const& resource_path)
   initializeShaderPrograms();
 
   //init textures
-  initializeTextures();
+  //initializeTextures();
 }
 
 ApplicationSolar::~ApplicationSolar() {
@@ -164,6 +164,11 @@ void ApplicationSolar::initializePlanetGeometry() {
   glEnableVertexAttribArray(1);
   // second attribute is 3 floats with no offset & stride
   glVertexAttribPointer(1, model::NORMAL.components, model::NORMAL.type, GL_FALSE, m_planet_model.vertex_bytes, m_planet_model.offsets[model::NORMAL]);
+  // activate third attribute on gpu
+  glEnableVertexAttribArray(2);
+  // second attribute is 2 floats with no offset & stride
+  glVertexAttribPointer(2, model::TEXCOORD.components, model::TEXCOORD.type, GL_FALSE, m_planet_model.vertex_bytes, m_planet_model.offsets[model::TEXCOORD]);
+
 
    // generate generic buffer
   glGenBuffers(1, &planet_object.element_BO);
@@ -217,6 +222,12 @@ void ApplicationSolar::initializeStarGeometry() {
   // second attribute is 3 floats WITH OFFSET TO FLOAT AT INDEX 3 (start of normale) type is void pointer
   glVertexAttribPointer(1, model::NORMAL.components, model::NORMAL.type,
    GL_FALSE, star_model.vertex_bytes, star_model.offsets[model::NORMAL]);
+
+   // activate third attribute on gpu
+  glEnableVertexAttribArray(2);
+  // second attribute is 2 floats with no offset & stride
+  glVertexAttribPointer(2, model::TEXCOORD.components, model::TEXCOORD.type,
+   GL_FALSE, m_planet_model.vertex_bytes, m_planet_model.offsets[model::TEXCOORD]);
 
   //Deleted generation of generic buffer
 

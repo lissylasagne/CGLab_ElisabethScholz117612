@@ -83,4 +83,5 @@ void GeometryNode::initTexture(){
 	
 	glTexImage2D(GL_TEXTURE_2D, 0, m_texture.channels, m_texture.width, m_texture.height, 
 			0, m_texture.channels, m_texture.channel_type, m_texture.ptr());
+
 }
