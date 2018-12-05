@@ -11,7 +11,7 @@ in float pass_LightIntensity;
 
 in vec2 pass_TexCoords;
 
-uniform Sampler2D PlanetTexture;
+uniform sampler2D PlanetTexture;
 
 flat in int pass_ShaderMode;
 
@@ -20,22 +20,33 @@ out vec4 out_Color;
 
 void main() {
 
-	vec3 textureColor = texture(pass_PlanetTexture, pass_TexCoords);
-
 	// Const
 	float pi = 3.1415926;
 	
 	// Parameters
+	vec3 ambient_color;
+	vec3 diffuse_color;
+	vec3 specular_color;
 
-	// using PlanetColor
-	//vec3 ambient_color = pass_Color.xyz * 0.01;
-	//vec3 diffuse_color = pass_Color;
-	//vec3 specular_color = pass_Color * 1.2;//pass_LightColor;
-	
-	// using TextureColor
-	vec3 ambient_color = textureColor.xyz * 0.01;
-	vec3 diffuse_color = textureColor;
-	vec3 specular_color = textureColor * 1.2;//pass_LightColor;
+	if(pass_ShaderMode == 2){
+		// using PlanetColor
+		ambient_color = pass_Color.xyz * 0.01;
+		diffuse_color = pass_Color;
+		specular_color = pass_Color * 1.2;//pass_LightColor;	
+	}
+	else if (pass_ShaderMode == 3){
+		// using TextureColor
+		vec4 textureColor = texture(PlanetTexture, pass_TexCoords);
+		ambient_color = textureColor.xyz * 0.01;
+		diffuse_color = textureColor.xyz;
+		specular_color = textureColor.xyz * 1.2;//pass_LightColor;
+	}
+	else{
+		// using PlanetColor
+		ambient_color = pass_Color.xyz * 0.01;
+		diffuse_color = pass_Color;
+		specular_color = pass_Color * 1.2;//pass_LightColor;	
+	}
 
 	//rho
 	float reflectivity = 1.0;

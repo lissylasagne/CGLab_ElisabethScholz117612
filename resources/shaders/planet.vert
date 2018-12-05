@@ -59,8 +59,6 @@ void main(void)
 	// Texture
 	pass_TexCoords = in_TexCoords;
 
-	// NormalMap?
-
 	// Shadermode
 	pass_ShaderMode = ShaderMode;
 }

@@ -118,7 +118,6 @@ void ApplicationSolar::initializeShaderPrograms() {
   m_shaders.at("planet").u_locs["ViewMatrix"] = -1; // = daraus camera position ableiten?
   m_shaders.at("planet").u_locs["ProjectionMatrix"] = -1;
   m_shaders.at("planet").u_locs["PlanetColor"] = -1; // = diffuse and ambient color
-  m_shaders.at("planet").u_locs["NormalTexture"] = -1;
 
   //planet shader specific uniforms
   m_shaders.at("planet").u_locs["LightPosition"] = -1;
@@ -423,7 +422,13 @@ void ApplicationSolar::renderPlanet(GeometryNode* planet) const {
   // SHADERMODE
   if(m_shading_mode == "blinn_phong"){
     glUniform1i(m_shaders.at("planet").u_locs.at("ShaderMode"), 1); 
-  } else glUniform1i(m_shaders.at("planet").u_locs.at("ShaderMode"), 2);
+  }
+  else if (m_shading_mode == "cel_shading"){
+  	glUniform1i(m_shaders.at("planet").u_locs.at("ShaderMode"), 2); 
+  }
+  else if (m_shading_mode == "textures"){
+  	glUniform1i(m_shaders.at("planet").u_locs.at("ShaderMode"), 3);
+  }
 
   // VAO
   glBindVertexArray(planet_object.vertex_AO);
@@ -499,6 +504,12 @@ void ApplicationSolar::keyCallback(int key, int action, int mods) {
 
   else if(key == GLFW_KEY_2 && (action == GLFW_PRESS || action == GLFW_REPEAT)) {
     m_shading_mode = "cel_shading";
+    uploadView();
+    uploadProjection();
+  }
+
+  else if(key == GLFW_KEY_3 && (action == GLFW_PRESS || action == GLFW_REPEAT)) {
+    m_shading_mode = "textures";
     uploadView();
     uploadProjection();
   }
