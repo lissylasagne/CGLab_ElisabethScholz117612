@@ -342,8 +342,8 @@ void ApplicationSolar::renderPlanets() const{
 	  GeometryNode* jupiter = dynamic_cast<GeometryNode*>(sun->getChildren("jupiter"));
 	  GeometryNode* saturn = dynamic_cast<GeometryNode*>(sun->getChildren("saturn"));
 	  GeometryNode* uranus = dynamic_cast<GeometryNode*>(sun->getChildren("uranus"));
-	  GeometryNode* neptune = dynamic_cast<GeometryNode*>(earth->getChildren("neptune"));
-	  GeometryNode* pluto = dynamic_cast<GeometryNode*>(earth->getChildren("pluto"));
+	  GeometryNode* neptune = dynamic_cast<GeometryNode*>(sun->getChildren("neptune"));
+	  GeometryNode* pluto = dynamic_cast<GeometryNode*>(sun->getChildren("pluto"));
 
   renderPlanet(sun);
 
@@ -355,10 +355,10 @@ void ApplicationSolar::renderPlanets() const{
   renderPlanet(mars);
   renderPlanet(jupiter);
   renderPlanet(saturn);
-  //renderPlanet(uranus);
-  //renderPlanet(neptune);
+  renderPlanet(uranus);
+  renderPlanet(neptune);
 
-  //renderPlanet(pluto);
+  renderPlanet(pluto);
 }
 
 //deal with gl
@@ -455,65 +455,91 @@ void ApplicationSolar::renderStars() const {
 
 // handle key input
 void ApplicationSolar::keyCallback(int key, int action, int mods) {
-  if (key == GLFW_KEY_R  && (action == GLFW_PRESS || action == GLFW_REPEAT)) {
-    m_view_transform = glm::translate(m_view_transform, glm::fvec3{0.0f, 0.0f, -0.1f});
-    uploadView();
-  } //closer; negative z direction
-  else if (key == GLFW_KEY_E  && (action == GLFW_PRESS || action == GLFW_REPEAT)) {
-    m_view_transform = glm::translate(m_view_transform, glm::fvec3{0.0f, 0.0f, 0.1f});
-    uploadView();
-  } //further; positive z direction
-  else if (key == GLFW_KEY_W  && (action == GLFW_PRESS || action == GLFW_REPEAT)) {
-    m_view_transform = glm::translate(m_view_transform, glm::fvec3{0.0f, -0.1f, 0.0f});
-    uploadView();
-  } //up; negative y direction
-  else if (key == GLFW_KEY_S  && (action == GLFW_PRESS || action == GLFW_REPEAT)) {
-    m_view_transform = glm::translate(m_view_transform, glm::fvec3{0.0f, 0.1f, 0.0f});
-    uploadView();
-  } //down; positive y direction
-  else if (key == GLFW_KEY_A  && (action == GLFW_PRESS || action == GLFW_REPEAT)) {
-    m_view_transform = glm::translate(m_view_transform, glm::fvec3{0.1f, 0.0f, 0.0f});
-    uploadView();
-  } //left; positive x direction
-  else if (key == GLFW_KEY_D  && (action == GLFW_PRESS || action == GLFW_REPEAT)) {
-    m_view_transform = glm::translate(m_view_transform, glm::fvec3{-0.1f, 0.0f, 0.0f});
-    uploadView();
-  } //right; negative x direction
+    
+    //Zoom in: I
+    //Zoom out: O
+    //Move up: W
+    //Move down: S
+    //Move to the left: A
+    //Move to the right: D
   
-  else if(key == GLFW_KEY_1 && (action == GLFW_PRESS || action == GLFW_REPEAT)) {
-    m_shading_mode = "blinn_phong";
-    uploadView();
-    uploadProjection();
-  }
+    //zoom in
+    if (key == GLFW_KEY_I  && (action == GLFW_PRESS || action == GLFW_REPEAT)) {
+        m_view_transform = glm::translate(m_view_transform, glm::fvec3{0.0f, 0.0f, -0.3f});
+        uploadView();
+    }
+    //zoom out
+    else if (key == GLFW_KEY_O  && (action == GLFW_PRESS || action == GLFW_REPEAT)) {
+        m_view_transform = glm::translate(m_view_transform, glm::fvec3{0.0f, 0.0f, 0.3f});
+        uploadView();
+    }
+    //move camera right
+    else if(key == GLFW_KEY_D && (action == GLFW_PRESS || action == GLFW_REPEAT )){
+        m_view_transform = glm::translate(m_view_transform, glm::fvec3{0.3f, 0.0f, 0.0f});
+        uploadView();
+    }
+    //move camera left
+    else if(key == GLFW_KEY_A && (action == GLFW_PRESS || action == GLFW_REPEAT )){
+        m_view_transform = glm::translate(m_view_transform, glm::fvec3{-0.3f, 0.0f, 0.0f});
+        uploadView();
+    }
+    //move camera down
+    else if(key == GLFW_KEY_S && (action == GLFW_PRESS || action == GLFW_REPEAT )){
+        m_view_transform = glm::translate(m_view_transform, glm::fvec3{0.0f, -0.3f, 0.0f});
+        uploadView();
+    }
+    //move camera up
+    else if(key == GLFW_KEY_W && (action == GLFW_PRESS || action == GLFW_REPEAT )){
+        m_view_transform = glm::translate(m_view_transform, glm::fvec3{0.0f, 0.3f, 0.0f});
+        uploadView();
+    }
+    //rotate camera up
+    else if(key == GLFW_KEY_N && (action == GLFW_PRESS || action == GLFW_REPEAT )){
+        m_view_transform = glm::rotate(m_view_transform, 0.005f, glm::fvec3{1.0f, 0.0f, 0.0f});
+        uploadView();
+    }
+    //rotate camera down
+    else if(key == GLFW_KEY_M && (action == GLFW_PRESS || action == GLFW_REPEAT )){
+        m_view_transform = glm::rotate(m_view_transform, -0.005f, glm::fvec3{1.0f, 0.0f, 0.0f});
+        uploadView();
+    }
 
-  else if(key == GLFW_KEY_2 && (action == GLFW_PRESS || action == GLFW_REPEAT)) {
-    m_shading_mode = "cel_shading";
-    uploadView();
-    uploadProjection();
-  }
+    //Shadermodes
 
-  else if(key == GLFW_KEY_3 && (action == GLFW_PRESS || action == GLFW_REPEAT)) {
-    m_shading_mode = "textures";
-    uploadView();
-    uploadProjection();
-  }
+    else if(key == GLFW_KEY_1 && (action == GLFW_PRESS || action == GLFW_REPEAT)) {
+      m_shading_mode = "blinn_phong";
+      uploadView();
+      uploadProjection();
+    }
+
+    else if(key == GLFW_KEY_2 && (action == GLFW_PRESS || action == GLFW_REPEAT)) {
+      m_shading_mode = "cel_shading";
+      uploadView();
+      uploadProjection();
+    }
+
+    else if(key == GLFW_KEY_3 && (action == GLFW_PRESS || action == GLFW_REPEAT)) {
+      m_shading_mode = "textures";
+      uploadView();
+      uploadProjection();
+    }
 }
 
 //handle delta mouse movement input
 void ApplicationSolar::mouseCallback(double pos_x, double pos_y) {
   // mouse handling
-   if (pos_x > 0){
-        m_view_transform = glm::rotate(m_view_transform, 0.005f,glm::fvec3{0.0f, 1.0f, 0.0f});
+ /* if (pos_x > 0){
+        m_view_transform = glm::rotate(m_view_transform, 0.005f, glm::fvec3{0.0f, 1.0f, 0.0f});
     }
     else if(pos_x < 0){
-        m_view_transform = glm::rotate(m_view_transform, -0.005f,glm::fvec3{0.0f, 1.0f, 0.0f});
+        m_view_transform = glm::rotate(m_view_transform, -0.005f, glm::fvec3{0.0f, 1.0f, 0.0f});
     }
     if(pos_y > 0){
-        m_view_transform = glm::rotate(m_view_transform, 0.005f,glm::fvec3{1.0f, 0.0f, 0.0f});
+        m_view_transform = glm::rotate(m_view_transform, 0.005f, glm::fvec3{1.0f, 0.0f, 0.0f});
     } 
     else if(pos_y < 0){
-        m_view_transform = glm::rotate(m_view_transform, -0.005f,glm::fvec3{1.0f, 0.0f, 0.0f});
-}
+        m_view_transform = glm::rotate(m_view_transform, -0.005f, glm::fvec3{1.0f, 0.0f, 0.0f});
+  }*/
   uploadView();
 }
 
