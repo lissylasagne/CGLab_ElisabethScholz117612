@@ -322,8 +322,46 @@ void ApplicationSolar::initializeStars(int numberStars) {
   }
 }
 
+
 void ApplicationSolar::initializeSkybox() {
 
+}
+
+void ApplicationSolar::initializeFramebuffer() {
+  glGenRenderbuffers(1, &frame_buffer_object.handle);
+  glBindRenderbuffer(GL_RENDERBUFFER, frame_buffer_object.handle);
+  glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH_COMPONENT24, GLsizei(1920u), GLsizei(1080u));
+
+  /*
+  glActiveTexture(GL_TEXTURE0);
+  glGenTextures(1, &frame_buffer_texture.handle);
+  glBindTexture(GL_TEXTURE_2D, frame_buffer_texture.handle);
+  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+  glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, GLsizei(1920u), GLsizei(1080u), 0, GL_RGB, GL_UNSIGNED_BYTE, NULL);
+  */
+  
+  //Define Framebuffer
+  glGenFramebuffers(1, &frame_buffer_object.handle);
+  glBindFramebuffer(GL_FRAMEBUFFER, frame_buffer_object.handle); 
+  
+  //Define Attachments (one call for each attachment to be defined)
+  glFramebufferTexture(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, frame_buffer_texture.handle, 0);
+  //glFramebufferTexture(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT i / GL_DEPTH_ATTACHMENT, tex_handle, mipmap_level);
+  glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_RENDERBUFFER, frame_buffer_object.handle);
+  //glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT / GL_STENCIL_ATTACHMENT, GL_RENDERBUFFER, rb_handle);
+  
+  //Define which Buffers to Write 
+  GLenum draw_buffers[1] = {GL_COLOR_ATTACHMENT0};
+  //GLenum draw_buffers[n] = { GL_COLOR_ATTACHMENT0, ... };
+  glDrawBuffers(1, draw_buffers);
+  //glDrawBuffers(1, GL_DEPTH_ATTACHMENT/GL_STENCIL_ATTACHMENT);
+  
+  //Check that the Framebuffer can be written; hence, that...
+  if(glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE)
+    {
+      std::cout << "framebuffer kaputt :(" << std::endl;
+    }
 }
 
 
@@ -363,25 +401,21 @@ void ApplicationSolar::renderPlanets() const{
 
 //deal with gl
 void ApplicationSolar::renderPlanet(GeometryNode* planet) const {
-  std::cout << "started renderng\n";
   // **** Upload data to shader *****
 
   // MODEL MATRIX DATA
   glm::fmat4 model_matrix = makeModelMatrix(planet);
   glUniformMatrix4fv(m_shaders.at("planet").u_locs.at("ModelMatrix"),
                      1, GL_FALSE, glm::value_ptr(model_matrix));
-  std::cout << "finished matrix data\n";
 
   // PLANET COLOR DATA
   glm::fvec3 planetColor = planet->getColor();
   glUniform3f(m_shaders.at("planet").u_locs.at("PlanetColor"), planetColor.x, planetColor.y, planetColor.z);
-  std::cout << "finished color data\n";
 
   // NORMAL MATRIX DATA (extra matrix for normal transformation to keep them orthogonal to surface)
   glm::fmat4 normal_matrix = glm::inverseTranspose(glm::inverse(m_view_transform) * model_matrix);
   glUniformMatrix4fv(m_shaders.at("planet").u_locs.at("NormalMatrix"),
                      1, GL_FALSE, glm::value_ptr(normal_matrix));
-  std::cout << "finished normal matrix data\n";
 
   //SUNLIGHT DATA
   PointLightNode* sunlightNode = dynamic_cast<PointLightNode*>(m_scene.getRoot()->getChildren("sunlight"));
@@ -389,12 +423,11 @@ void ApplicationSolar::renderPlanet(GeometryNode* planet) const {
   glUniform3f(m_shaders.at("planet").u_locs.at("LightPosition"), 0.0f, 0.0f, 0.0f);
   glUniform1f(m_shaders.at("planet").u_locs.at("LightIntensity"), sunlightNode->getIntensity());
   glUniform3f(m_shaders.at("planet").u_locs.at("LightColor"), lightColor.x, lightColor.y, lightColor.z);
-  std::cout << "finished sunlight data\n";
 
 	// TEXTURES
   // GL_TEXTURE0 - color texture
   int name = planet->getTextureObject().handle;
-  std::cout << "texture handle: " << name << "\n";
+
   //Bind Texture for Accessing
   glActiveTexture(GL_TEXTURE0);
   glBindTexture(GL_TEXTURE_2D, planet->getTextureObject().handle);
@@ -411,12 +444,10 @@ void ApplicationSolar::renderPlanet(GeometryNode* planet) const {
   else if (m_shading_mode == "textures"){
   	glUniform1i(m_shaders.at("planet").u_locs.at("ShaderMode"), 3);
   }
-  std::cout << "finished shader data\n";
 
   // VAO
   glBindVertexArray(planet_object.vertex_AO);
   glDrawElements(planet_object.draw_mode, planet_object.num_elements, model::INDEX.type, NULL);
-  std::cout << "finished vao\n";
 }
 
 glm::fmat4 ApplicationSolar::makeModelMatrix(GeometryNode* planet) const{
