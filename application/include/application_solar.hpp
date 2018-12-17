@@ -54,7 +54,7 @@ class ApplicationSolar : public Application {
   // cpu representation of model
   model_object planet_object;
   model_object star_object;
-  model_object texture_object;
+  //model_object m_texture_object;
   model_object skybox_object;
 
   texture_object frame_buffer_texture;

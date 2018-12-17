@@ -322,7 +322,6 @@ void ApplicationSolar::initializeStars(int numberStars) {
   }
 }
 
-<<<<<<< HEAD
 
 void ApplicationSolar::initializeSkybox() {
 
@@ -428,12 +427,8 @@ void ApplicationSolar::renderPlanet(GeometryNode* planet) const {
 	// TEXTURES
   // GL_TEXTURE0 - color texture
   int name = planet->getTextureObject().handle;
-<<<<<<< HEAD
 
-=======
-  std::cout << "texture handle: " << name << "\n";
   //Bind Texture for Accessing
->>>>>>> b6fc25d1944e89047f3e874a90a670ff3213de59
   glActiveTexture(GL_TEXTURE0);
   glBindTexture(GL_TEXTURE_2D, planet->getTextureObject().handle);
   // upload Texture data
