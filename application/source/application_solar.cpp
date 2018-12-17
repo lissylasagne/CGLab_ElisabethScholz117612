@@ -40,6 +40,8 @@ ApplicationSolar::ApplicationSolar(std::string const& resource_path)
   //init shaders
   initializeShaderPrograms();
 
+  //init framebuffer
+  initializeFramebuffer();
 }
 
 ApplicationSolar::~ApplicationSolar() {
@@ -95,6 +97,18 @@ void ApplicationSolar::uploadUniforms() {
   */
   uploadView();
   uploadProjection();
+  uploadQuads();
+}
+
+void ApplicationSolar::uploadQuads() {
+  glBindFramebuffer(GL_FRAMEBUFFER, 0);
+  glUseProgram(m_shaders.at("quad").handle);
+  glActiveTexture(GL_TEXTURE0);
+  glBindTexture(GL_TEXTURE_2D, frame_buffer_texture.handle);
+  int color_sampler_location = glGetUniformLocation(m_shaders.at("quad").handle, "ColorTex");
+  glUniform1i(color_sampler_location, 0);
+  glBindVertexArray(screen_quad_object.vertex_AO);
+  glDrawArrays(screen_quad_object.draw_mode, NULL, screen_quad_object.num_elements); 
 }
 
 ///////////////////////////// intialisation functions /////////////////////////
@@ -345,7 +359,7 @@ void ApplicationSolar::initializeFramebuffer() {
   glGenFramebuffers(1, &frame_buffer_object.handle);
   glBindFramebuffer(GL_FRAMEBUFFER, frame_buffer_object.handle); 
   
-  //Define Attachments (one call for each attachment to be defined)
+  //Dframebufferefine Attachments (one call for each attachment to be defined)
   glFramebufferTexture(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, frame_buffer_texture.handle, 0);
   //glFramebufferTexture(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT i / GL_DEPTH_ATTACHMENT, tex_handle, mipmap_level);
   glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_RENDERBUFFER, frame_buffer_object.handle);
@@ -369,7 +383,6 @@ void ApplicationSolar::initializeFramebuffer() {
 
 //deal with traversing the SceneGraph
 void ApplicationSolar::renderPlanets() const{
-	std::cout << "\n rendering the planets\n";
 	glUseProgram(m_shaders.at("planet").handle);
   GeometryNode* sun = dynamic_cast<GeometryNode*>(m_scene.getRoot()->getChildren("sun"));
 	  GeometryNode* mercury = dynamic_cast<GeometryNode*>(sun->getChildren("mercury"));

@@ -40,6 +40,8 @@ class ApplicationSolar : public Application {
   void uploadProjection();
   // upload view matrix
   void uploadView();
+  //upload quads
+  void uploadQuads();
 
   //rendering
   void renderPlanets() const;
@@ -57,8 +59,10 @@ class ApplicationSolar : public Application {
   //model_object m_texture_object;
   model_object skybox_object;
 
+  //frmbuffer objects
   texture_object frame_buffer_texture;
   texture_object frame_buffer_object;
+  model_object screen_quad_object;
   
   // camera transform matrix
   glm::fmat4 m_view_transform;
@@ -74,6 +78,7 @@ class ApplicationSolar : public Application {
   model m_planet_model;
   model m_star_model;
   std::string m_shading_mode;
+  std::vector<float> m_quads;
 };
 
 #endif
