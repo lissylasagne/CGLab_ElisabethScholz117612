@@ -40,8 +40,6 @@ ApplicationSolar::ApplicationSolar(std::string const& resource_path)
   //init shaders
   initializeShaderPrograms();
 
-  //init textures
-  //initializeTextures();
 }
 
 ApplicationSolar::~ApplicationSolar() {
@@ -324,6 +322,7 @@ void ApplicationSolar::initializeStars(int numberStars) {
   }
 }
 
+<<<<<<< HEAD
 
 void ApplicationSolar::initializeSkybox() {
 
@@ -364,7 +363,6 @@ void ApplicationSolar::initializeFramebuffer() {
     {
       std::cout << "framebuffer kaputt :(" << std::endl;
     }
-
 }
 
 
@@ -429,11 +427,16 @@ void ApplicationSolar::renderPlanet(GeometryNode* planet) const {
 
 	// TEXTURES
   // GL_TEXTURE0 - color texture
-  // GL_TEXTURE1 - normal ma
   int name = planet->getTextureObject().handle;
+<<<<<<< HEAD
 
+=======
+  std::cout << "texture handle: " << name << "\n";
+  //Bind Texture for Accessing
+>>>>>>> b6fc25d1944e89047f3e874a90a670ff3213de59
   glActiveTexture(GL_TEXTURE0);
   glBindTexture(GL_TEXTURE_2D, planet->getTextureObject().handle);
+  // upload Texture data
   glUniform1i(m_shaders.at("planet").u_locs.at("pass_PlanetTexture"), 0);
 
   // SHADERMODE

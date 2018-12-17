@@ -25,6 +25,9 @@ GeometryNode::GeometryNode(std::string const& t_name, glm::mat4 const& t_local,
 {
 	setLocalTransform(t_local);
 	setWorldTransform(t_world);
+
+	//set Texture loads pixel data from file, and initTexture creates
+	// an texture object with the handle for the generated texture
 	setTexture(file_name);
 	initTexture();
 }
@@ -75,20 +78,20 @@ texture_object GeometryNode::getTextureObject() const{
 
 void GeometryNode::initTexture(){
 	texture_object temp{};
+	//Initialize Texture
 	glActiveTexture(GL_TEXTURE0);
     glGenTextures(1, &temp.handle);
     glBindTexture(GL_TEXTURE_2D, temp.handle);
-    
+    //Define Texture Sampling Parameters
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_MIRRORED_REPEAT);
   	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_MIRRORED_REPEAT);
-	
+	//Texture Data and Format
 	glTexImage2D(GL_TEXTURE_2D, 0, m_texture.channels, m_texture.width, m_texture.height, 
 			0, m_texture.channels, m_texture.channel_type, m_texture.ptr());
 
-	std::cout << "texture_object: ";
-	std::cout << temp.handle;
-	std::cout << "\n";
+	//Save generated texture object with updated handle, aka name of the texture in the program
+	//to the member variable of the planet
 	m_textureObject = temp;
 }
