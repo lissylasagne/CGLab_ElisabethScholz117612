@@ -23,13 +23,17 @@ using namespace gl;
 ApplicationSolar::ApplicationSolar(std::string const& resource_path)
  :Application{resource_path}
  ,planet_object{}
+ ,m_screenquad_object{}
  ,m_view_transform{glm::translate(glm::fmat4{}, glm::fvec3{0.0f, 0.0f, 40.0f})}
  ,m_view_projection{utils::calculate_projection_matrix(initial_aspect_ratio)}
  ,m_shading_mode{"blinn_phong"}
 {
+  // Initialize object models
+  m_planet_model = model_loader::obj(m_resource_path + "models/sphere.obj", model::NORMAL);
+  m_screenquad_model = model_loader::obj(m_resource_path + "models/screenquad.obj", model::TEXCOORD);
+
   // init for Planets - for some reason, only sun + one planet are rendered if
   // initPlanets() is dome before initGeometry() ???
-  m_planet_model = model_loader::obj(m_resource_path + "models/sphere.obj", model::NORMAL);
   initializePlanetGeometry();
   initializePlanets();
 
@@ -37,11 +41,12 @@ ApplicationSolar::ApplicationSolar(std::string const& resource_path)
   initializeStars(3000); //fills m_stars with random star positions and colors
   initializeStarGeometry(); //uses m_stars to create m_star_model
 
+  //init for Off-Screen-Rendering
+  initializeScreenquad();
+  initializeFramebuffer();
+
   //init shaders
   initializeShaderPrograms();
-
-  //init framebuffer
-  initializeFramebuffer();
 }
 
 ApplicationSolar::~ApplicationSolar() {
@@ -55,8 +60,18 @@ ApplicationSolar::~ApplicationSolar() {
 }
 
 void ApplicationSolar::render() const {
-	renderPlanets();
+	
+  //Binding to Framebuffer Object to render the Planets and Stars to it
+  glBindFramebuffer(GL_FRAMEBUFFER, m_framebuffer.handle);
+  //Clearing Framebuffer Attachments, being the texture and renderbuffer
+  glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+  renderPlanets();
   renderStars();
+
+  //calling renderScreenquad to apply the fb to the quad and render it 
+  //to the default Framebuffer
+  renderScreenquad();
 }
 
 void ApplicationSolar::uploadView() {
@@ -97,21 +112,104 @@ void ApplicationSolar::uploadUniforms() {
   */
   uploadView();
   uploadProjection();
-  uploadQuads();
-}
-
-void ApplicationSolar::uploadQuads() {
-  glBindFramebuffer(GL_FRAMEBUFFER, 0);
-  glUseProgram(m_shaders.at("quad").handle);
-  glActiveTexture(GL_TEXTURE0);
-  glBindTexture(GL_TEXTURE_2D, frame_buffer_texture.handle);
-  int color_sampler_location = glGetUniformLocation(m_shaders.at("quad").handle, "ColorTex");
-  glUniform1i(color_sampler_location, 0);
-  glBindVertexArray(screen_quad_object.vertex_AO);
-  glDrawArrays(screen_quad_object.draw_mode, NULL, screen_quad_object.num_elements); 
 }
 
 ///////////////////////////// intialisation functions /////////////////////////
+
+// vergleichbar mit initPlanetGeometry
+void ApplicationSolar::initializeScreenquad() {
+    // generate vertex array object
+    glGenVertexArrays(1, &m_screenquad_object.vertex_AO);
+    // bind the array for attaching buffers
+    glBindVertexArray(m_screenquad_object.vertex_AO);
+
+    // generate generic buffer
+    glGenBuffers(1, &m_screenquad_object.vertex_BO);
+    // bind this as an vertex array buffer containing all attributes
+    glBindBuffer(GL_ARRAY_BUFFER, m_screenquad_object.vertex_BO);
+    // configure currently bound array buffer
+    glBufferData(GL_ARRAY_BUFFER, 
+      sizeof(float) * m_screenquad_model.data.size(), //how much data?
+      m_screenquad_model.data.data(),                   //where is the data?
+      GL_STATIC_DRAW);                                //how will the data be used?
+
+    // activate first attribute on gpu
+    glEnableVertexAttribArray(0);
+    // first attribute is 3 floats with no offset & stride
+    glVertexAttribPointer(0, model::POSITION.components, model::POSITION.type, 
+      GL_FALSE, m_screenquad_model.vertex_bytes, 
+      m_screenquad_model.offsets[model::POSITION]);
+
+    // activate second attribute on gpu
+    glEnableVertexAttribArray(1);
+    // first attribute is 3 floats with no offset & stride
+    glVertexAttribPointer(1, model::TEXCOORD.components, model::TEXCOORD.type, 
+      GL_FALSE, m_screenquad_model.vertex_bytes, 
+      m_screenquad_model.offsets[model::TEXCOORD]);
+
+    // store type of primitive to draw
+    m_screenquad_object.draw_mode = GL_TRIANGLE_STRIP;
+    // transfer number of indices to model object 
+    m_screenquad_object.num_elements = GLsizei(m_screenquad_model.indices.size());
+}
+
+void ApplicationSolar::initializeFramebuffer() {
+  //TODO: Anpassung an Fenstergröße?? width und height übergeben und in
+  // dieser Funktion anstatt der standard-Parameter 960 840 verwenden
+
+  // ********* Initialize Renderbuffer / Depth Attachment
+
+  glGenRenderbuffers(1, &m_fb_renderbuffer.handle);
+  glBindRenderbuffer(GL_RENDERBUFFER, m_fb_renderbuffer.handle);
+  glRenderbufferStorage(
+    GL_RENDERBUFFER,      //target has to be GL_Renderbuffer
+    GL_DEPTH_COMPONENT24, //internalformat - others used GL_DEPTH_COMPONENT32??
+    GLsizei(960u),       //width
+    GLsizei(840u));      //height
+  //resolution aus application.cpp : initial_resolution
+
+  // ********* Initialize Texture / Color Attachment
+  //generate and bind
+  glActiveTexture(GL_TEXTURE2); //new GL_TEXTUREi : 0 = planet color, 1 = planet normal
+  glGenTextures(1, &m_fb_texture.handle);
+  glBindTexture(GL_TEXTURE_2D, m_fb_texture.handle);
+  //Define Texture Sampling Parameters
+  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+  //Texture Data and Format
+  glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, GLsizei(960u), GLsizei(840u), 
+    0, GL_RGB, GL_UNSIGNED_BYTE, NULL);
+  
+  // ********* Framebuffer Definition and Usage
+
+  //Define Framebuffer
+  glGenFramebuffers(1, &m_framebuffer.handle);
+  glBindFramebuffer(GL_FRAMEBUFFER, m_framebuffer.handle);
+  
+  //Define Attachments (one call for each attachment to be defined)
+  //glFramebufferTexture(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT i / GL_DEPTH_ATTACHMENT, tex_handle, mipmap_level);
+  glFramebufferTexture(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, 
+    m_fb_texture.handle, 0);
+  //glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT / GL_STENCIL_ATTACHMENT, GL_RENDERBUFFER, rb_handle);
+  glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, 
+    GL_RENDERBUFFER, m_fb_renderbuffer.handle);
+  
+  // Define which Buffers to Write: 
+ 
+  //we only one color attachment therefore only one value in the enum
+  //GLenum draw_buffers[n] = { GL_COLOR_ATTACHMENT0, ... };
+  GLenum draw_buffers[1] = {GL_COLOR_ATTACHMENT0};
+  glDrawBuffers(1, draw_buffers);
+
+  //glDrawBuffers(1, GL_DEPTH_ATTACHMENT/GL_STENCIL_ATTACHMENT);
+  //glDrawBuffers(1, GL_DEPTH_ATTACHMENT);
+  
+  //Check that the Framebuffer can be written; hence, that...
+  if(glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE)
+    {
+      std::cout << "ERROR unable to write Framebuffer" << std::endl;
+    }
+}
 
 // load shader sources
 void ApplicationSolar::initializeShaderPrograms() {
@@ -152,6 +250,14 @@ void ApplicationSolar::initializeShaderPrograms() {
   //no normal or model matrix required for drawing points
   m_shaders.at("stars").u_locs["ViewMatrix"] = -1;
   m_shaders.at("stars").u_locs["ProjectionMatrix"] = -1;
+
+  // SCREENQUAD
+
+  //emplace uniform location for the Sampler2D of the Framebuffer-Texture
+  //that is generated by rendering the Scene to the Framebuffer
+  m_shaders.emplace("screenquad", shader_program{{{GL_VERTEX_SHADER,m_resource_path + "shaders/screenquad.vert"},
+                                           {GL_FRAGMENT_SHADER, m_resource_path + "shaders/screenquad.frag"}}});
+  m_shaders.at("screenquad").u_locs["FBTexture"] = -1;
 }
 
 void ApplicationSolar::initializePlanetGeometry() {
@@ -341,45 +447,39 @@ void ApplicationSolar::initializeSkybox() {
 
 }
 
-void ApplicationSolar::initializeFramebuffer() {
-  glGenRenderbuffers(1, &frame_buffer_object.handle);
-  glBindRenderbuffer(GL_RENDERBUFFER, frame_buffer_object.handle);
-  glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH_COMPONENT24, GLsizei(1920u), GLsizei(1080u));
-
-  /*
-  glActiveTexture(GL_TEXTURE0);
-  glGenTextures(1, &frame_buffer_texture.handle);
-  glBindTexture(GL_TEXTURE_2D, frame_buffer_texture.handle);
-  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-  glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, GLsizei(1920u), GLsizei(1080u), 0, GL_RGB, GL_UNSIGNED_BYTE, NULL);
-  */
-  
-  //Define Framebuffer
-  glGenFramebuffers(1, &frame_buffer_object.handle);
-  glBindFramebuffer(GL_FRAMEBUFFER, frame_buffer_object.handle); 
-  
-  //Dframebufferefine Attachments (one call for each attachment to be defined)
-  glFramebufferTexture(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, frame_buffer_texture.handle, 0);
-  //glFramebufferTexture(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT i / GL_DEPTH_ATTACHMENT, tex_handle, mipmap_level);
-  glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_RENDERBUFFER, frame_buffer_object.handle);
-  //glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT / GL_STENCIL_ATTACHMENT, GL_RENDERBUFFER, rb_handle);
-  
-  //Define which Buffers to Write 
-  GLenum draw_buffers[1] = {GL_COLOR_ATTACHMENT0};
-  //GLenum draw_buffers[n] = { GL_COLOR_ATTACHMENT0, ... };
-  glDrawBuffers(1, draw_buffers);
-  //glDrawBuffers(1, GL_DEPTH_ATTACHMENT/GL_STENCIL_ATTACHMENT);
-  
-  //Check that the Framebuffer can be written; hence, that...
-  if(glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE)
-    {
-      std::cout << "framebuffer kaputt :(" << std::endl;
-    }
-}
-
-
 ///////////////////////////// rendering functions /////////////////////////
+
+//uploading uniforms to screenquad shader and
+//rendering it to the default framebuffer
+void ApplicationSolar::renderScreenquad() const {
+
+  //back to rendering to the default framebuffer (0)
+  glBindFramebuffer(GL_FRAMEBUFFER, 0);
+
+  //Binding 
+  glUseProgram(m_shaders.at("screenquad").handle);
+  glActiveTexture(GL_TEXTURE2);
+    //"2" points to the texture from the framebuffer
+    // comparison: 0 = planet color texture, 1 = (in theory) planet normal texture
+  glBindTexture(GL_TEXTURE_2D, m_fb_texture.handle);
+
+  // im Vergleich: 
+  // glBindTexture(GL_TEXTURE_2D, planet->getTextureObject().handle);
+  // spezifiziert über das Handle genauso die Textur die verwendet wird
+  // m_fb_texture.handle wird in initializeFramebuffer() zugewiesen und mit
+  // renderbuffer verwendet für den Framebuffer, sodass die Ergebnisse aus dem
+  // shader wenn zum framebuffer gerendert wird, in die texture geschrieben werden
+  // auf die m_fb_texture.handle verweist
+
+  //uploading Texture Sampler2D to screenquad shader
+  //"FBTexture" ist Sampler location, 2 points to the Active Texture GL_Texture2
+  glUniform1i(m_shaders.at("screenquad").u_locs.at("FBTexture"), 2);
+  
+  //Draw Screenquad Object (will be rendered to default framebuffer now)
+  glBindVertexArray(m_screenquad_object.vertex_AO);
+  glDrawArrays(m_screenquad_object.draw_mode, NULL, 
+    m_screenquad_object.num_elements); 
+}
 
 //deal with traversing the SceneGraph
 void ApplicationSolar::renderPlanets() const{

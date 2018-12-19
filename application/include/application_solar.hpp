@@ -32,7 +32,6 @@ class ApplicationSolar : public Application {
   void initializePlanets();
   void initializeStars(int numberStars);
   void initializeSkybox();
-  void initializeFramebuffer();
 
   // update uniform values
   void uploadUniforms();
@@ -40,8 +39,6 @@ class ApplicationSolar : public Application {
   void uploadProjection();
   // upload view matrix
   void uploadView();
-  //upload quads
-  void uploadQuads();
 
   //rendering
   void renderPlanets() const;
@@ -59,12 +56,7 @@ class ApplicationSolar : public Application {
   //model_object m_texture_object;
   model_object skybox_object;
 
-  //frmbuffer objects
-  texture_object frame_buffer_texture;
-  texture_object frame_buffer_object;
-  model_object screen_quad_object;
   
-  // camera transform matrix
   glm::fmat4 m_view_transform;
 
   // camera projection matrix
@@ -78,7 +70,28 @@ class ApplicationSolar : public Application {
   model m_planet_model;
   model m_star_model;
   std::string m_shading_mode;
-  std::vector<float> m_quads;
+
+  // ***************** Off-Screen Rendering Stuff *************
+
+  void initializeScreenquad();
+  void initializeFramebuffer();
+
+  //uploading uniforms to screenquad shader and
+  //rendering it to the default framebuffer
+  void renderScreenquad() const; 
+
+  //framebuffer objects
+  texture_object m_framebuffer; //Zugriff: initalisierung und bei render() bei Auswahl des zu verwendenden Buffers für Planeten Sterne
+  texture_object m_fb_texture; //COLOR ATTACHMENT = hat handle und target werte, in initFramebuffer über glGenTexture initialisiert 
+  texture_object m_fb_renderbuffer; //DEPTH ATTACHMENT = hat handle und target werte, in initFramebuffer über glGenRenderbuffer initialisiert 
+
+  model m_screenquad_model; //enthält model daten und wird in c'tor initialisiert
+  
+  //wie planet object enthält alle für das rendern relevanten daten (ist auch einzigartig!)
+  //initialisierung int initScreenquad() mit screenquad_model (für glBufferData) und generierung von VAO und VBO und festlegen des draw mode
+  //rendern des screenquad (bindVertexArray(sq_obj.vertex_AO) etc.)
+  model_object m_screenquad_object;
+
 };
 
 #endif
