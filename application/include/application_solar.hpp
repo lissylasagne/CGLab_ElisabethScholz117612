@@ -71,6 +71,11 @@ class ApplicationSolar : public Application {
   model m_star_model;
   std::string m_shading_mode;
 
+  bool m_grayscale;
+  bool m_horizontal_mirror;
+  bool m_vertical_mirror;
+  bool m_blur;
+
   // ***************** Off-Screen Rendering Stuff *************
 
   void initializeScreenquad();

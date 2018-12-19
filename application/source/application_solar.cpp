@@ -27,6 +27,10 @@ ApplicationSolar::ApplicationSolar(std::string const& resource_path)
  ,m_view_transform{glm::translate(glm::fmat4{}, glm::fvec3{0.0f, 0.0f, 40.0f})}
  ,m_view_projection{utils::calculate_projection_matrix(initial_aspect_ratio)}
  ,m_shading_mode{"blinn_phong"}
+ ,m_grayscale{false}
+ ,m_horizontal_mirror{false}
+ ,m_vertical_mirror{false}
+ ,m_blur{false}
 {
   // Initialize object models
   m_planet_model = model_loader::obj(m_resource_path + "models/sphere.obj", model::NORMAL);
@@ -258,6 +262,11 @@ void ApplicationSolar::initializeShaderPrograms() {
   m_shaders.emplace("screenquad", shader_program{{{GL_VERTEX_SHADER,m_resource_path + "shaders/screenquad.vert"},
                                            {GL_FRAGMENT_SHADER, m_resource_path + "shaders/screenquad.frag"}}});
   m_shaders.at("screenquad").u_locs["FBTexture"] = -1;
+
+  m_shaders.at("screenquad").u_locs["Grayscale"] = 0;
+  m_shaders.at("screenquad").u_locs["HorizontalMirror"] = 0;
+  m_shaders.at("screenquad").u_locs["VerticalMirror"] = 0;
+  m_shaders.at("screenquad").u_locs["Blur"] = 0;
 }
 
 void ApplicationSolar::initializePlanetGeometry() {
@@ -510,6 +519,12 @@ void ApplicationSolar::renderPlanets() const{
   renderPlanet(neptune);
 
   renderPlanet(pluto);
+
+  glUseProgram(m_shaders.at("screenquad").handle);
+  glUniform1i(m_shaders.at("screenquad").u_locs.at("Grayscale"), m_grayscale);
+  glUniform1i(m_shaders.at("screenquad").u_locs.at("HorizontalMirror"), m_horizontal_mirror);
+  glUniform1i(m_shaders.at("screenquad").u_locs.at("VerticalMirror"), m_vertical_mirror);
+  glUniform1i(m_shaders.at("screenquad").u_locs.at("Blur"), m_blur);
 }
 
 //deal with gl
@@ -664,6 +679,31 @@ void ApplicationSolar::keyCallback(int key, int action, int mods) {
 
     else if(key == GLFW_KEY_3 && (action == GLFW_PRESS || action == GLFW_REPEAT)) {
       m_shading_mode = "textures";
+      uploadView();
+      uploadProjection();
+    }
+
+    //FILTERMODEs
+    else if(key == GLFW_KEY_7 && (action == GLFW_PRESS || action == GLFW_REPEAT)) {
+      m_grayscale? m_grayscale = false : m_grayscale = true;
+      uploadView();
+      uploadProjection();
+    }
+
+    else if(key == GLFW_KEY_8 && (action == GLFW_PRESS || action == GLFW_REPEAT)) {
+      m_horizontal_mirror ? m_horizontal_mirror = false : m_horizontal_mirror = true;
+      uploadView();
+      uploadProjection();
+    }
+
+    else if(key == GLFW_KEY_9 && (action == GLFW_PRESS || action == GLFW_REPEAT)) {
+      m_vertical_mirror ? m_vertical_mirror = false : m_vertical_mirror = true;
+      uploadView();
+      uploadProjection();
+    }
+
+    else if(key == GLFW_KEY_0 && (action == GLFW_PRESS || action == GLFW_REPEAT)) {
+      m_blur ? m_blur = false : m_blur = true;
       uploadView();
       uploadProjection();
     }
